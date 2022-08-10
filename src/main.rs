@@ -5,8 +5,8 @@ use crate::sensors::SensorsProvider;
 
 mod avionics;
 mod gui;
+mod providers;
 mod sensors;
-
 
 
 fn main() {
@@ -28,8 +28,8 @@ fn main() {
 
     assert_eq!(config["provider"]["name"].as_str().unwrap(), "xpln11");
 
-    let provider: Box<dyn SensorsProvider> = sensors::sensors_init(&config);
-    provider.init();
+    let sensors_provider: Box<dyn SensorsProvider> = sensors::sensors_init(&config);
+    sensors_provider.init();
 
     avionics::avionics_init();
     gui::gui_init();

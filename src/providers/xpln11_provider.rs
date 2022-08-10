@@ -1,6 +1,9 @@
 use yaml_rust::Yaml;
 
-use super::SensorsProvider;
+use crate::sensors::SensorsProvider;
+use super::providers::Provider;
+
+const NAME: &str = "XPLN11";
 
 pub struct XPLN11SensorsProvider {
 
@@ -18,21 +21,29 @@ impl XPLN11SensorsProvider {
 
 }
 
-impl SensorsProvider for XPLN11SensorsProvider {
+impl Provider for XPLN11SensorsProvider {
 
-    fn init(&self) {
-        println!("XPLN11 SensorsProvider config : host: {}, port: {}", self.host, self.port);
-        self.connect();
+    fn name(&self) -> &str {
+
+        return NAME;
     }
 
-    fn acquire(&self) {
-        println!("XPLN11 SensorsProvider acquire");
-        self.get_data();
+    fn init(&self) {
+        println!("XPLN11 Provider config : host: {}, port: {}", self.host, self.port);
+        self.connect();
     }
 
     fn shutdown(&self) {
         println!("XPLN11 SensorsProvider shutdown");
         self.close();
+    }
+}
+
+impl SensorsProvider for XPLN11SensorsProvider {
+
+    fn acquire(&self) {
+        println!("XPLN11 SensorsProvider acquire");
+        self.get_data();
     }
 }
 
