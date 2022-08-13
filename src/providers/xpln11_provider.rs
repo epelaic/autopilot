@@ -1,9 +1,6 @@
 
 use yaml_rust::Yaml;
 use std::error::Error;
-use std::fs;
-use std::io::Split;
-use std::mem;
 use std::fmt;
 use std::collections::HashMap;
 use std::time::Duration;
@@ -135,31 +132,31 @@ impl XPLN11SensorsProvider {
 
         for i in (5..*number_of_bytes).step_by(4 + 32) {
 
-            let index: i32 = self.decode_int_data(buf, i);
+            let index: i32 = self.decode_int_data(&buf, i);
             //println!("UDP index :'{}'", index);
 
-            let data1: f32 = self.decode_float_data(buf, i + 4);
+            let data1: f32 = self.decode_float_data(&buf, i + 4);
             //println!("UDP data 1 :'{}'", data1);
 
-            let data2: f32 = self.decode_float_data(buf, i + 8);
+            let data2: f32 = self.decode_float_data(&buf, i + 8);
             //println!("UDP data 2 :'{}'", data2);
 
-            let data3: f32 = self.decode_float_data(buf, i + 12);
+            let data3: f32 = self.decode_float_data(&buf, i + 12);
             //println!("UDP data 3 :'{}'", data3);
 
-            let data4: f32 = self.decode_float_data(buf, i + 16);
+            let data4: f32 = self.decode_float_data(&buf, i + 16);
             //println!("UDP data 4 :'{}'", data4);
 
-            let data5: f32 = self.decode_float_data(buf, i + 20);
+            let data5: f32 = self.decode_float_data(&buf, i + 20);
             //println!("UDP data 5 :'{}'", data5);
 
-            let data6: f32 = self.decode_float_data(buf, i + 24);
+            let data6: f32 = self.decode_float_data(&buf, i + 24);
             //println!("UDP data 6 :'{}'", data6);
 
-            let data7: f32 = self.decode_float_data(buf, i + 28);
+            let data7: f32 = self.decode_float_data(&buf, i + 28);
             //println!("UDP data 7 :'{}'", data7);
 
-            let data8: f32 = self.decode_float_data(buf, i + 32);
+            let data8: f32 = self.decode_float_data(&buf, i + 32);
             //println!("UDP data 8 :'{}'", data8);
 
             let data_fragment = XPLN11UDPDataFragment{index, data1, data2, data3, data4, data5, data6, data7, data8};
@@ -170,7 +167,8 @@ impl XPLN11SensorsProvider {
         Ok(data_message)
     }
 
-    fn decode_int_data(&self, buf: [u8; 1000], start: usize) -> i32 {
+    /// Decode i32 data from 4 bytes in little endian.
+    fn decode_int_data(&self, buf: &[u8], start: usize) -> i32 {
 
         let mut bytes:[u8; 4] = [0;4];
         bytes[0] = buf[start];
@@ -183,7 +181,8 @@ impl XPLN11SensorsProvider {
         return data_index;
     }
 
-    fn decode_float_data(&self, buf: [u8; 1000], start: usize) -> f32 {
+    // Decode f32 data from 4 bytes in little endian.
+    fn decode_float_data(&self, buf: &[u8], start: usize) -> f32 {
 
         let mut bytes:[u8; 4] = [0;4];
         bytes[0] = buf[start];
