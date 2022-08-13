@@ -11,7 +11,7 @@ pub mod providers {
     pub trait Provider {
 
         fn name(&self) -> &str;
-        fn init(&self);
+        fn init(&mut self);
         fn shutdown(&self);
     }
 
