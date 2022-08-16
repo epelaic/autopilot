@@ -1,9 +1,11 @@
 
 extern crate yaml_rust;
+use flight_ctrls::FlightCtrlsProvider;
 use yaml_rust::{YamlLoader, Yaml};
-use crate::sensors::SensorsProvider;
+use crate::{sensors::SensorsProvider, flight_ctrl::flight_ctrls, providers::providers::Provider};
 
 mod avionics;
+mod flight_ctrl;
 mod gui;
 mod providers;
 mod sensors;
@@ -16,7 +18,8 @@ fn main() {
     provider: 
         name: xpln11
         host: 127.0.0.1
-        port: 49003
+        read_port: 49003
+        write_port: 49000
     ";
        
     let configs = YamlLoader::load_from_str(config_file_str).unwrap();
@@ -28,8 +31,15 @@ fn main() {
 
     assert_eq!(config["provider"]["name"].as_str().unwrap(), "xpln11");
 
-    let mut sensors_provider: Box<dyn SensorsProvider> = sensors::sensors_init(&config);
-    sensors_provider.init();
+    let mut provider: Box::<dyn Provider> = providers::resolve_provider(&config);
+    provider.init();
+    provider.acquire();
+    provider.send();
+    provider.acquire();
+    provider.send();
+    provider.acquire();
+    provider.acquire();
+    
 
     avionics::avionics_init();
     gui::gui_init();
