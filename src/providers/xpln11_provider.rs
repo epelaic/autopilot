@@ -51,7 +51,7 @@ pub struct XPLN11Provider {
     host: String,
     read_port: i64,
     write_port: i64,
-    socket: Option<Box<UdpSocket>>,
+    socket: Option<UdpSocket>,
 }
 
 impl XPLN11Provider {
@@ -72,30 +72,13 @@ impl XPLN11Provider {
             s.set_read_timeout(Some(DATA_MESSAGE_READ_TIMEOUT_VALUE)).expect("set_read_timeout call failed");
             s.set_write_timeout(Some(DATA_MESSAGE_WRITE_TIMEOUT_VALUE)).expect("set_write_timeout call failed");
 
-            self.socket = Some(Box::new(s));
+            self.socket = Some(s);
 
             return Ok(());
         } else {
             let err = bind_result.unwrap_err();
             println!("Error during connection to xplane read socket : {:?}", err);
             return Err(err);
-        }
-    }
-
-    fn get_data(&self) -> Result<XPLN11UDPDataMessage, Box<dyn std::error::Error>> {
-
-        let mut buf:[u8; DATA_MESSAGE_BUFFER_SIZE_VALUE] = [0; DATA_MESSAGE_BUFFER_SIZE_VALUE];
-        let socket: &Box::<UdpSocket> = self.socket.as_ref().unwrap();
-        let (number_of_bytes, _src) = socket.recv_from(&mut buf).unwrap();
-        
-        match decode_data(&number_of_bytes, buf) {
-            Ok(message) => {
-
-                let (_key, data_frg1) = message.data.get_key_value(&0).unwrap();
-                println!("message index 0 data 1 : {}", data_frg1.data1);
-                return Ok(message)
-            },
-            Err(e) => return Err(e)
         }
     }
 
@@ -117,9 +100,50 @@ impl Provider for XPLN11Provider {
     fn shutdown(&self) {
         println!("XPLN11 Provider shutdown");
     }
+
+    fn get_sensors(&self) -> Box::<dyn SensorsProvider> {
+
+        let s: &UdpSocket = self.socket.as_ref().unwrap();
+
+        let socket = s.try_clone().unwrap();
+        Box::new(XMPL11SensorsProvider{ socket: socket })
+    }
+
+    fn get_flcs(&self) -> Box::<dyn FlightCtrlsProvider> {
+
+        let s: &UdpSocket = self.socket.as_ref().unwrap();
+
+        let socket = s.try_clone().unwrap();
+        Box::new(XPLN11FlightCtrlsProvider{host: self.host.clone(), write_port: self.write_port, socket: socket})
+    }
 }
 
-impl SensorsProvider for XPLN11Provider {
+struct XMPL11SensorsProvider {
+
+    socket: UdpSocket,
+}
+
+impl XMPL11SensorsProvider {
+
+    fn get_data(&self) -> Result<XPLN11UDPDataMessage, Box<dyn std::error::Error>> {
+
+        let mut buf:[u8; DATA_MESSAGE_BUFFER_SIZE_VALUE] = [0; DATA_MESSAGE_BUFFER_SIZE_VALUE];
+        let socket: &UdpSocket = &self.socket;
+        let (number_of_bytes, _src) = socket.recv_from(&mut buf).unwrap();
+        
+        match decode_data(&number_of_bytes, buf) {
+            Ok(message) => {
+
+                let (_key, data_frg1) = message.data.get_key_value(&0).unwrap();
+                println!("message index 0 data 1 : {}", data_frg1.data1);
+                return Ok(message)
+            },
+            Err(e) => return Err(e)
+        }
+    }
+}
+
+impl SensorsProvider for XMPL11SensorsProvider {
 
     fn acquire(&self) {
         println!("XPLN11 ProviderProvider acquire");
@@ -127,13 +151,20 @@ impl SensorsProvider for XPLN11Provider {
     }
 }
 
+struct  XPLN11FlightCtrlsProvider {
 
-impl FlightCtrlsProvider for XPLN11Provider {
+    host: String,
+    write_port: i64,
+    socket: UdpSocket
+}
+
+
+impl FlightCtrlsProvider for XPLN11FlightCtrlsProvider {
 
     fn send(&self) {
 
         let url = format!("{}:{}", self.host, self.write_port);
-        let socket = self.socket.as_ref().unwrap();
+        let socket: &UdpSocket = &self.socket;
         //socket.connect(url).expect("Error connection to write socket");
 
         //while (true) {

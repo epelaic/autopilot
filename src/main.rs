@@ -27,18 +27,22 @@ fn main() {
     let config: &Yaml = &configs[0];
 
     // Debug support
-    println!("{:?}", config);
+    // println!("{:?}", config);
 
     assert_eq!(config["provider"]["name"].as_str().unwrap(), "xpln11");
 
     let mut provider: Box::<dyn Provider> = providers::resolve_provider(&config);
     provider.init();
-    provider.acquire();
-    provider.send();
-    provider.acquire();
-    provider.send();
-    provider.acquire();
-    provider.acquire();
+
+    let sensors: Box::<dyn SensorsProvider> = provider.get_sensors();
+    let flcs: Box::<dyn FlightCtrlsProvider> = provider.get_flcs();
+
+    sensors.acquire();
+    flcs.send();
+    sensors.acquire();
+    flcs.send();
+    sensors.acquire();
+    sensors.acquire();
     
 
     avionics::avionics_init();

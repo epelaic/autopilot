@@ -9,11 +9,13 @@ pub mod providers {
     use crate::sensors::SensorsProvider;
     use crate::providers::xpln11_provider;
 
-    pub trait Provider : SensorsProvider + FlightCtrlsProvider{
+    pub trait Provider {
 
         fn name(&self) -> &str;
         fn init(&mut self);
         fn shutdown(&self);
+        fn get_sensors(&self) -> Box::<dyn SensorsProvider>;
+        fn get_flcs(&self) -> Box::<dyn FlightCtrlsProvider>;
     }
 
     enum SensorsProviderEnum {
