@@ -11,9 +11,62 @@
  * - G Load factor (Gs)
  */
 
-const REGISTRY: AdcRegistry = AdcRegistry::new();
+use crate::{ sensors::SensorsProvider };
+
+pub struct  Adc {
+    registry: AdcRegistry,
+    sensors: Box::<dyn SensorsProvider>,
+}
+
+impl Adc {
+
+    fn get_frame(&self) -> AdcRegistry {
+
+        self.sensors.acquire();
+
+        return self.registry.clone();
+    }
+
+    fn dump_registry_state_to_console(&self) {
+
+        println!("AdcRegistry state : ias: {}, alt: {},vs: {}, aoa: {}, mach: {}, g_load : {}", 
+            self.registry.ias, 
+            self.registry.alt,
+            self.registry.vs,
+            self.registry.aoa,
+            self.registry.mach,
+            self.registry.g_load
+        );
+    }
+
+    pub fn ias(&self) -> i16{
+        return self.registry.ias;
+    }
+
+    pub fn alt(&self) -> i16 {
+        return self.registry.alt;
+    }
+
+    pub fn vs(&self) -> i16 {
+        return self.registry.vs;
+    }
+
+    pub fn aoa(&self) -> i16 {
+        return self.registry.aoa;
+    }
+
+    pub fn mach(&self) -> i16 {
+        return self.registry.mach;
+    }
+
+    pub fn g_load(&self) -> i16 {
+        return self.registry.g_load;
+    }
+}
 
 
+
+#[derive(Clone)]
 pub struct AdcRegistry {
 
     ias: i16,
@@ -37,55 +90,21 @@ impl AdcRegistry {
             g_load: 0,
         };
     }
-
-    pub fn ias(&self) -> i16{
-        return self.ias;
-    }
-
-    pub fn alt(&self) -> i16 {
-        return self.alt;
-    }
-
-    pub fn vs(&self) -> i16 {
-        return self.vs;
-    }
-
-    pub fn aoa(&self) -> i16 {
-        return self.aoa;
-    }
-
-    pub fn mach(&self) -> i16 {
-        return self.mach;
-    }
-
-    pub fn g_load(&self) -> i16 {
-        return self.g_load;
-    }
-
 }
 
-pub fn adc_init() -> AdcRegistry {
+pub fn adc_init(sensors: Box::<dyn SensorsProvider>) -> Adc {
     
     println!("Start init adc module");
 
     //let ias = REGISTRY.ias();
-    //let alt: i16 = REGISTRY.alt();
-
-    dump_registry_state_to_console();
+    //let alt: i16 = REGISTRY.alt()
 
     println!("End init adc module");
 
-    return REGISTRY;
+    let adc = Adc{registry: AdcRegistry::new(), sensors: sensors};
+
+    adc.dump_registry_state_to_console();
+
+    return adc;
 }
 
-fn dump_registry_state_to_console() {
-
-    println!("AdcRegistry state : ias: {}, alt: {},vs: {}, aoa: {}, mach: {}, g_load : {}", 
-        REGISTRY.ias(), 
-        REGISTRY.alt(),
-        REGISTRY.vs(),
-        REGISTRY.aoa(),
-        REGISTRY.mach(),
-        REGISTRY.g_load()
-    );
-}

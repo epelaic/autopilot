@@ -7,6 +7,7 @@ use std::time::Duration;
 use std::net::UdpSocket;
 use crate::sensors::SensorsProvider;
 use crate::flight_ctrl::FlightCtrlsProvider;
+use crate::sensors::sensors::SensorsValues;
 use super::providers::Provider;
 
 
@@ -145,9 +146,11 @@ impl XMPL11SensorsProvider {
 
 impl SensorsProvider for XMPL11SensorsProvider {
 
-    fn acquire(&self) {
+    fn acquire(&self) -> SensorsValues {
         println!("XPLN11 ProviderProvider acquire");
         let _raw_data = self.get_data();
+
+        SensorsValues::new()
     }
 }
 

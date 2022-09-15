@@ -2,7 +2,7 @@
 extern crate yaml_rust;
 use flight_ctrls::FlightCtrlsProvider;
 use yaml_rust::{YamlLoader, Yaml};
-use crate::{sensors::SensorsProvider, flight_ctrl::flight_ctrls, providers::providers::Provider};
+use crate::{sensors::SensorsProvider, flight_ctrl::flight_ctrls, providers::providers::Provider, avionics::{avionics::Avionics}};
 
 mod avionics;
 mod flight_ctrl;
@@ -45,7 +45,8 @@ fn main() {
     sensors.acquire();
     
 
-    avionics::avionics_init();
+    let avionics: Avionics = avionics::avionics_init(sensors, flcs);
+
     gui::gui_init();
 
     println!("Autopilot ready");
