@@ -39,27 +39,27 @@ impl Adc {
         );
     }
 
-    pub fn ias(&self) -> i16{
+    pub fn ias(&self) -> f32 {
         return self.registry.ias;
     }
 
-    pub fn alt(&self) -> i16 {
+    pub fn alt(&self) -> f32 {
         return self.registry.alt;
     }
 
-    pub fn vs(&self) -> i16 {
+    pub fn vs(&self) -> f32 {
         return self.registry.vs;
     }
 
-    pub fn aoa(&self) -> i16 {
+    pub fn aoa(&self) -> f32 {
         return self.registry.aoa;
     }
 
-    pub fn mach(&self) -> i16 {
+    pub fn mach(&self) -> f32 {
         return self.registry.mach;
     }
 
-    pub fn g_load(&self) -> i16 {
+    pub fn g_load(&self) -> f32 {
         return self.registry.g_load;
     }
 }
@@ -69,12 +69,12 @@ impl Adc {
 #[derive(Clone)]
 pub struct AdcRegistry {
 
-    ias: i16,
-    alt: i16,
-    vs: i16,
-    aoa: i16,
-    mach: i16,
-    g_load: i16
+    ias: f32,
+    alt: f32,
+    vs: f32,
+    aoa: f32,
+    mach: f32,
+    g_load: f32
 }
 
 impl AdcRegistry {
@@ -82,12 +82,12 @@ impl AdcRegistry {
     const fn new() -> AdcRegistry {
 
         return AdcRegistry {
-            ias: 0, 
-            alt: 0,
-            vs: 0,
-            aoa: 0,
-            mach: 0,
-            g_load: 0,
+            ias: 0f32, 
+            alt: 0f32,
+            vs: 0f32,
+            aoa: 0f32,
+            mach: 0f32,
+            g_load: 0f32,
         };
     }
 }
@@ -96,14 +96,11 @@ pub fn adc_init(sensors: Box::<dyn SensorsProvider>) -> Adc {
     
     println!("Start init adc module");
 
-    //let ias = REGISTRY.ias();
-    //let alt: i16 = REGISTRY.alt()
-
-    println!("End init adc module");
-
     let adc = Adc{registry: AdcRegistry::new(), sensors: sensors};
 
     adc.dump_registry_state_to_console();
+
+    println!("End init adc module");
 
     return adc;
 }

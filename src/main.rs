@@ -1,10 +1,19 @@
 
 extern crate yaml_rust;
+use std::sync::mpsc::{Receiver, Sender};
+use std::sync::mpsc;
+use std::thread;
 use flight_ctrls::FlightCtrlsProvider;
 use yaml_rust::{YamlLoader, Yaml};
-use crate::{sensors::SensorsProvider, flight_ctrl::flight_ctrls, providers::providers::Provider, avionics::{avionics::Avionics}};
+use crate::bus::{AdcDataMessage, APCmdMessage, APStateMessage, BusMessage};
+use crate::{
+    sensors::SensorsProvider, 
+    flight_ctrl::flight_ctrls, 
+    providers::providers::Provider, 
+    avionics::{avionics::Avionics}};
 
 mod avionics;
+mod bus;
 mod flight_ctrl;
 mod gui;
 mod providers;
@@ -37,13 +46,18 @@ fn main() {
     let sensors: Box::<dyn SensorsProvider> = provider.get_sensors();
     let flcs: Box::<dyn FlightCtrlsProvider> = provider.get_flcs();
 
-    sensors.acquire();
-    flcs.send();
-    sensors.acquire();
-    flcs.send();
-    sensors.acquire();
-    sensors.acquire();
+    //sensors.acquire();
+    //flcs.send();
+    //sensors.acquire();
+    //flcs.send();
+    //sensors.acquire();
+    //sensors.acquire();
     
+    // MPSC channel to send data from (ADC, AP) to GUI.
+    let (tx_gui , rx_gui): (Sender<BusMessage>, Receiver<BusMessage>) = mpsc::channel();
+
+    // MPSC channel to send data from (ADC, GUI) data to AP.
+    let (tx_ap , rx_ap): (Sender<BusMessage>, Receiver<BusMessage>) = mpsc::channel();
 
     let avionics: Avionics = avionics::avionics_init(sensors, flcs);
 
