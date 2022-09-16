@@ -38,8 +38,6 @@ fn main() {
     // Debug support
     // println!("{:?}", config);
 
-    assert_eq!(config["provider"]["name"].as_str().unwrap(), "xpln11");
-
     let mut provider: Box::<dyn Provider> = providers::resolve_provider(&config);
     provider.init();
 

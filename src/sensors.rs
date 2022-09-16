@@ -28,6 +28,24 @@ pub mod sensors {
                 g_load: 0f32,
             };
         }
+
+        pub const fn from(
+                    ias: f32, 
+                    alt: f32,
+                    vs: f32,
+                    aoa: f32,
+                    mach: f32,
+                    g_load: f32) -> SensorsValues {
+    
+            return SensorsValues {
+                ias: ias, 
+                alt: alt,
+                vs: vs,
+                aoa: aoa,
+                mach: mach,
+                g_load: g_load,
+            };
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 pub(crate) mod xpln11_provider;
+pub(crate) mod sim_mock_provider;
 
 pub mod providers {
 
@@ -8,6 +9,7 @@ pub mod providers {
     use crate::flight_ctrl::FlightCtrlsProvider;
     use crate::sensors::SensorsProvider;
     use crate::providers::xpln11_provider;
+    use crate::providers::sim_mock_provider;
 
     pub trait Provider {
 
@@ -20,24 +22,28 @@ pub mod providers {
 
     enum SensorsProviderEnum {
         XPLN11,
+        SIMMOCK,
     }
 
     impl fmt::Display for SensorsProviderEnum {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
                 SensorsProviderEnum::XPLN11 => write!(f, "xpln11"),
+                SensorsProviderEnum::SIMMOCK => write!(f, "simmock"),
             }
         }
     }
 
     enum FligthCtrlsProviderEnum {
         XPLN11,
+        SIMMOCK,
     }
 
     impl fmt::Display for FligthCtrlsProviderEnum {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             match self {
                 FligthCtrlsProviderEnum::XPLN11 => write!(f, "xpln11"),
+                FligthCtrlsProviderEnum::SIMMOCK => write!(f, "simmock"),
             }
         }
     }
@@ -53,6 +59,9 @@ pub mod providers {
         if SensorsProviderEnum::XPLN11.to_string().eq(provider_name) {
             println!("Loading X-Plane 11 sensors provider");
             provider = xpln11_provider::xpl11_provider_init(&config) as Box<dyn Provider>;
+        } else if SensorsProviderEnum::SIMMOCK.to_string().eq(provider_name) {
+            println!("Loading SimMock sensors provider");
+            provider = sim_mock_provider::simmock_provider_init(&config) as Box<dyn Provider>;
         } else {
             panic!("Unknown provider: {provider_name}");
         }

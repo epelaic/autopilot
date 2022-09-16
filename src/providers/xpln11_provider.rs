@@ -147,7 +147,7 @@ impl XMPL11SensorsProvider {
 impl SensorsProvider for XMPL11SensorsProvider {
 
     fn acquire(&self) -> SensorsValues {
-        println!("XPLN11 ProviderProvider acquire");
+        println!("XPLN11 Provider acquire");
         let _raw_data = self.get_data();
 
         SensorsValues::new()
