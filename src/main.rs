@@ -1,8 +1,10 @@
 
 extern crate yaml_rust;
+use std::env;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::mpsc;
 use std::thread;
+use std::fs;
 use flight_ctrls::FlightCtrlsProvider;
 use yaml_rust::{YamlLoader, Yaml};
 use crate::bus::{AdcDataMessage, APCmdMessage, APStateMessage, BusMessage};
@@ -22,16 +24,14 @@ mod sensors;
 
 fn main() {
 
-    let config_file_str: &str =
-    "
-    provider: 
-        name: xpln11
-        host: 127.0.0.1
-        read_port: 49003
-        write_port: 49000
-    ";
-       
-    let configs = YamlLoader::load_from_str(config_file_str).unwrap();
+    let args: Vec<String> = env::args().collect();
+
+    let conf_file_path: &String = &args[1];
+
+    let conf_file: String = fs::read_to_string(conf_file_path).unwrap();
+    let config_file_str: &str = conf_file.as_str();
+    
+    let configs: Vec<Yaml> = YamlLoader::load_from_str(config_file_str).unwrap();
 
     let config: &Yaml = &configs[0];
 

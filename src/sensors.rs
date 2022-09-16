@@ -7,12 +7,12 @@ pub mod sensors {
 
     pub struct SensorsValues {
 
-        ias: i16,
-        alt: i16,
-        vs: i16,
-        aoa: i16,
-        mach: i16,
-        g_load: i16
+        ias: f32,
+        alt: f32,
+        vs: f32,
+        aoa: f32,
+        mach: f32,
+        g_load: f32
     }
     
     impl SensorsValues {
@@ -20,12 +20,12 @@ pub mod sensors {
         pub const fn new() -> SensorsValues {
     
             return SensorsValues {
-                ias: 0, 
-                alt: 0,
-                vs: 0,
-                aoa: 0,
-                mach: 0,
-                g_load: 0,
+                ias: 0f32, 
+                alt: 0f32,
+                vs: 0f32,
+                aoa: 0f32,
+                mach: 0f32,
+                g_load: 0f32,
             };
         }
     }
