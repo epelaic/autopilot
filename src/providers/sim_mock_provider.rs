@@ -1,4 +1,6 @@
 
+use std::sync::Arc;
+
 use yaml_rust::Yaml;
 use crate::sensors::SensorsProvider;
 use crate::flight_ctrl::FlightCtrlsProvider;
@@ -27,14 +29,14 @@ impl Provider for SimMockProvider {
         println!("SimMock Provider shutdown");
     }
 
-    fn get_sensors(&self) -> Box::<dyn SensorsProvider> {
+    fn get_sensors(&self) -> Arc::<dyn SensorsProvider + Send + Sync> {
 
-        Box::new(SimMockSensorsProvider{})
+        Arc::new(SimMockSensorsProvider{})
     }
 
-    fn get_flcs(&self) -> Box::<dyn FlightCtrlsProvider> {
+    fn get_flcs(&self) -> Arc::<dyn FlightCtrlsProvider + Send + Sync> {
 
-        Box::new(SimMockFlightCtrlsProvider{})
+        Arc::new(SimMockFlightCtrlsProvider{})
     }
 }
 

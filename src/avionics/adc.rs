@@ -1,4 +1,10 @@
 
+use std::ops::Deref;
+use std::sync::Arc;
+use std::thread;
+use std::{sync::mpsc::Sender, time::Duration};
+
+use crate::sensors::sensors::SensorsValues;
 /**
  * ADC for Air Data Computer
  * Provide centralized calculated values from différents Air sensors like pitot probe,
@@ -11,57 +17,32 @@
  * - G Load factor (Gs)
  */
 
-use crate::{ sensors::SensorsProvider };
+use crate::{ sensors::SensorsProvider, bus::{AdcDataMessage} };
 
 pub struct  Adc {
-    registry: AdcRegistry,
-    sensors: Box::<dyn SensorsProvider>,
+    sensors: Arc::<dyn SensorsProvider + Send + Sync>
 }
 
 impl Adc {
 
-    fn get_frame(&self) -> AdcRegistry {
+    pub fn get_frame(&self) -> AdcRegistry {
 
-        self.sensors.acquire();
-
-        return self.registry.clone();
+        let s_values: SensorsValues = self.sensors.acquire();
+        self.apply_sensors_values(s_values)
     }
 
-    fn dump_registry_state_to_console(&self) {
+    fn apply_sensors_values(&self, s_values: SensorsValues) -> AdcRegistry {
 
-        println!("AdcRegistry state : ias: {}, alt: {},vs: {}, aoa: {}, mach: {}, g_load : {}", 
-            self.registry.ias, 
-            self.registry.alt,
-            self.registry.vs,
-            self.registry.aoa,
-            self.registry.mach,
-            self.registry.g_load
-        );
+        AdcRegistry{
+            ias: s_values.ias,
+            alt: s_values.alt,
+            vs: s_values.vs,
+            aoa: s_values.aoa,
+            mach: s_values.mach,
+            g_load: s_values.g_load    
+        }
     }
 
-    pub fn ias(&self) -> f32 {
-        return self.registry.ias;
-    }
-
-    pub fn alt(&self) -> f32 {
-        return self.registry.alt;
-    }
-
-    pub fn vs(&self) -> f32 {
-        return self.registry.vs;
-    }
-
-    pub fn aoa(&self) -> f32 {
-        return self.registry.aoa;
-    }
-
-    pub fn mach(&self) -> f32 {
-        return self.registry.mach;
-    }
-
-    pub fn g_load(&self) -> f32 {
-        return self.registry.g_load;
-    }
 }
 
 
@@ -90,15 +71,28 @@ impl AdcRegistry {
             g_load: 0f32,
         };
     }
+
+    pub fn to_adc_data(&self) -> AdcDataMessage {
+
+        return AdcDataMessage{
+            ias: self.ias, 
+            alt: self.alt, 
+            vs: self.vs, 
+            aoa: self.aoa, 
+            mach: self.mach, 
+            g_load: self.g_load, 
+            pitch_angle: 0f32, 
+            roll_angle: 0f32
+        };
+    }
 }
 
-pub fn adc_init(sensors: Box::<dyn SensorsProvider>) -> Adc {
+pub fn adc_init(
+        sensors: Arc::<dyn SensorsProvider + Send + Sync>) -> Adc {
     
     println!("Start init adc module");
 
-    let adc = Adc{registry: AdcRegistry::new(), sensors: sensors};
-
-    adc.dump_registry_state_to_console();
+    let adc = Adc{sensors: sensors};
 
     println!("End init adc module");
 

@@ -5,6 +5,7 @@ pub mod providers {
 
     extern crate yaml_rust;
     use core::fmt;
+    use std::sync::Arc;
     use yaml_rust::Yaml;
     use crate::flight_ctrl::FlightCtrlsProvider;
     use crate::sensors::SensorsProvider;
@@ -16,8 +17,8 @@ pub mod providers {
         fn name(&self) -> &str;
         fn init(&mut self);
         fn shutdown(&self);
-        fn get_sensors(&self) -> Box::<dyn SensorsProvider>;
-        fn get_flcs(&self) -> Box::<dyn FlightCtrlsProvider>;
+        fn get_sensors(&self) -> Arc::<dyn SensorsProvider + Send + Sync>;
+        fn get_flcs(&self) -> Arc::<dyn FlightCtrlsProvider + Send + Sync>;
     }
 
     enum SensorsProviderEnum {

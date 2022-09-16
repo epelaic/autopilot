@@ -1,6 +1,7 @@
 
 use yaml_rust::Yaml;
 use std::error::Error;
+use std::sync::Arc;
 use std::{fmt, thread};
 use std::collections::HashMap;
 use std::time::Duration;
@@ -102,20 +103,20 @@ impl Provider for XPLN11Provider {
         println!("XPLN11 Provider shutdown");
     }
 
-    fn get_sensors(&self) -> Box::<dyn SensorsProvider> {
+    fn get_sensors(&self) -> Arc::<dyn SensorsProvider + Send + Sync> {
 
         let s: &UdpSocket = self.socket.as_ref().unwrap();
 
         let socket = s.try_clone().unwrap();
-        Box::new(XMPL11SensorsProvider{ socket: socket })
+        Arc::new(XMPL11SensorsProvider{ socket: socket })
     }
 
-    fn get_flcs(&self) -> Box::<dyn FlightCtrlsProvider> {
+    fn get_flcs(&self) -> Arc::<dyn FlightCtrlsProvider + Send + Sync> {
 
         let s: &UdpSocket = self.socket.as_ref().unwrap();
 
         let socket = s.try_clone().unwrap();
-        Box::new(XPLN11FlightCtrlsProvider{host: self.host.clone(), write_port: self.write_port, socket: socket})
+        Arc::new(XPLN11FlightCtrlsProvider{host: self.host.clone(), write_port: self.write_port, socket: socket})
     }
 }
 

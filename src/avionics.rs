@@ -1,32 +1,35 @@
 
-mod adc;
-mod autopilot;
+pub mod adc;
+pub mod autopilot;
 
 pub mod avionics {
 
-    use crate::{
-        avionics::{adc::{self,Adc}, autopilot::{autopilot, autopilot::Autopilot}}, 
-        sensors::SensorsProvider, flight_ctrl::FlightCtrlsProvider};
+    use std::{sync::{mpsc::Sender, Arc}, sync::mpsc::Receiver, time::Duration, thread};
 
-    pub fn avionics_init(sensors: Box::<dyn SensorsProvider>, flcs: Box::<dyn FlightCtrlsProvider>) -> Avionics {
+    use crate::{
+        avionics::{adc::{self,Adc, AdcRegistry}, autopilot::{autopilot, autopilot::Autopilot}}, 
+        sensors::SensorsProvider, flight_ctrl::FlightCtrlsProvider, bus::{BusMessage, AdcDataMessage}};
+
+    pub fn avionics_init(
+            sensors: Arc::<dyn SensorsProvider + Send + Sync>, 
+            flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync>) -> Avionics {
 
         println!("Start init avionics module");
-        
-        let adc: Adc = adc::adc_init(sensors);
+
+        let adc: Arc::<Adc> = Arc::new(adc::adc_init(sensors));
 
         let autopilot: Autopilot = autopilot::autopilot_init(flcs);
-        
-        adc.ias();
 
         println!("End init avionics module");
 
-        Avionics {adc, autopilot}
+        Avionics {adc: adc, autopilot}
     }
 
     pub struct Avionics {
-        pub adc: Adc,
+        pub adc: Arc::<Adc>,
         pub autopilot: Autopilot,
     }
 }
 
 pub use avionics::avionics_init;
+

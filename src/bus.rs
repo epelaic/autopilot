@@ -1,5 +1,7 @@
 
 pub mod bus {
+    use std::fmt;
+
 
     pub enum BusMessage {
         AdcData(AdcDataMessage),
@@ -8,18 +10,28 @@ pub mod bus {
     }
 
     // ADC Messages
+    
+    #[derive(Debug)]
     pub struct AdcDataMessage {
-        ias: f32,
-        alt: f32,
-        vs: f32,
-        aoa: f32,
-        mach: f32,
-        g_load: f32,
-        pitch_angle: f32,
-        rool_angle: f32,
+        pub ias: f32,
+        pub alt: f32,
+        pub vs: f32,
+        pub aoa: f32,
+        pub mach: f32,
+        pub g_load: f32,
+        pub pitch_angle: f32,
+        pub roll_angle: f32,
+    }
+
+    impl fmt::Display for AdcDataMessage {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f, "ias: {}, alt: {}, vs: {}, aoa: {}, mach: {}, g_load: {}, pitch: {}, roll: {}", 
+            self.ias, self.alt, self.vs, self.aoa, self.mach, self.g_load, self.pitch_angle, self.roll_angle)
+        }
     }
 
     // AP Messages
+    #[derive(Debug)]
     pub struct APStateMessage {
 
         engaged: bool,
@@ -40,10 +52,12 @@ pub mod bus {
         vs: f32,
     }
 
+    #[derive(Debug)]
     pub struct APCmdMessage {
         payload: APCCmd
     }
 
+    #[derive(Debug)]
     pub enum  APCCmd {
 
         APEngage(bool),
@@ -64,11 +78,13 @@ pub mod bus {
 
     }
 
+    #[derive(Debug)]
     pub enum APTurnSide {
         Left,
         Right
     }
 
+    #[derive(Debug)]
     pub enum SpeedUnit {
         IAS,
         MACH

@@ -7,12 +7,12 @@ pub mod sensors {
 
     pub struct SensorsValues {
 
-        ias: f32,
-        alt: f32,
-        vs: f32,
-        aoa: f32,
-        mach: f32,
-        g_load: f32
+        pub ias: f32,
+        pub alt: f32,
+        pub vs: f32,
+        pub aoa: f32,
+        pub mach: f32,
+        pub g_load: f32
     }
     
     impl SensorsValues {

@@ -2,7 +2,10 @@ mod pfd;
 
 pub mod gui {
 
-    use crate::gui::pfd;
+    use std::sync::mpsc::{Receiver, Sender};
+    use std::thread;
+    use std::time::Duration;
+    use crate::{gui::pfd, bus::BusMessage};
 
     pub fn gui_init() {
 
@@ -11,6 +14,7 @@ pub mod gui {
         pfd::pfd_init();
 
         println!("End init gui module");
+
     }
 }
 

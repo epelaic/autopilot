@@ -1,9 +1,11 @@
 
 pub mod autopilot {
 
+    use std::sync::Arc;
+
     use crate::{flight_ctrl::FlightCtrlsProvider};
 
-    pub fn autopilot_init(flcs: Box::<dyn FlightCtrlsProvider>) -> Autopilot {
+    pub fn autopilot_init(flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync>) -> Autopilot {
 
         println!("Start init autopilot module");
 
@@ -15,7 +17,7 @@ pub mod autopilot {
     pub struct Autopilot {
 
         engaged: bool,
-        flcs: Box::<dyn FlightCtrlsProvider>,
+        flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync>,
     }
 
 }
