@@ -13,16 +13,14 @@ use std::sync::{mpsc, Arc};
 use std::thread;
 use std::fs;
 use std::time::Duration;
-use flight_ctrls::FlightCtrlsProvider;
 use yaml_rust::{YamlLoader, Yaml};
+
 use crate::avionics::adc::adc::{ AdcRegistry, Adc};
 use crate::avionics::autopilot::autopilot::Autopilot;
-use crate::bus::{AdcDataMessage, APStateMessage, BusMessage, SpeedUnit};
-use crate::{
-    sensors::SensorsProvider, 
-    flight_ctrl::flight_ctrls, 
-    providers::providers::Provider, 
-};
+use crate::bus::{AdcDataMessage, BusMessage};
+use crate::sensors::SensorsProvider; 
+use crate::flight_ctrl::flight_ctrls::FlightCtrlsProvider; 
+use crate::providers::providers::Provider;
 
 fn main() {
 
@@ -66,7 +64,7 @@ fn main() {
             let adc_registry: AdcRegistry = adc.get_frame();
 
             let adc_data:AdcDataMessage = adc_registry.to_adc_data();
-            let gui_bus_message = BusMessage::AdcData(adc_data);
+            let gui_bus_message: BusMessage = BusMessage::AdcData(adc_data);
             let ap_bus_message: BusMessage = gui_bus_message.clone();
 
             println!("[ADC] sending data...");
