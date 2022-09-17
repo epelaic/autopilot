@@ -77,9 +77,6 @@ fn main() {
 
     // Init Thread AP
     let ap_handler = thread::spawn(move || -> ! {
-
-
-        let d: Duration = Duration::from_millis(100);
         
         loop {
 
@@ -94,8 +91,6 @@ fn main() {
                 },            
                 Err(_) => println!("[AP] Message processing error")
             }
-
-            thread::sleep(d);
         }
     });
 
@@ -103,11 +98,10 @@ fn main() {
     let gui_handler = thread::spawn(move || -> ! {
 
         gui::gui_init();
-
-        let d: Duration = Duration::from_millis(1000);
         
         loop {
 
+            // Read Sensor Data or AP State
             match rx_gui.recv() {
                 Ok(message) => {
                     match message {
@@ -118,8 +112,6 @@ fn main() {
                 },            
                 Err(_) => println!("[GUI] Message processing error")
             }
-
-            thread::sleep(d);
         }
     });
 
