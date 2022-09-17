@@ -2,7 +2,7 @@
 pub mod bus {
     use std::fmt;
 
-
+    #[derive(Debug, Clone)]
     pub enum BusMessage {
         AdcData(AdcDataMessage),
         APState(APStateMessage),
@@ -11,7 +11,7 @@ pub mod bus {
 
     // ADC Messages
     
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct AdcDataMessage {
         pub ias: f32,
         pub alt: f32,
@@ -31,34 +31,34 @@ pub mod bus {
     }
 
     // AP Messages
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct APStateMessage {
 
-        engaged: bool,
+        pub engaged: bool,
 
         // Modes AP
-        alt_hold_mode: bool,
-        vs_mode: bool,
-        heading_mode: bool,
-        auto_throttle_mode: bool,
+        pub alt_hold_mode: bool,
+        pub vs_mode: bool,
+        pub heading_mode: bool,
+        pub auto_throttle_mode: bool,
 
         // Modes values
 
-        alt: f32,
-        heading: f32,
-        speed: f32,
-        speed_unit: SpeedUnit,
-        bank_angle: f32,
-        vs: f32,
+        pub alt: f32,
+        pub heading: f32,
+        pub speed: f32,
+        pub speed_unit: SpeedUnit,
+        pub bank_angle: f32,
+        pub vs: f32,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct APCmdMessage {
-        payload: APCCmd
+        payload: APCmd
     }
 
-    #[derive(Debug)]
-    pub enum  APCCmd {
+    #[derive(Debug, Clone)]
+    pub enum  APCmd {
 
         APEngage(bool),
 
@@ -78,13 +78,13 @@ pub mod bus {
 
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub enum APTurnSide {
         Left,
         Right
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub enum SpeedUnit {
         IAS,
         MACH
@@ -98,3 +98,5 @@ pub use bus::BusMessage;
 pub use bus::AdcDataMessage;
 pub use bus::APStateMessage;
 pub use bus::APCmdMessage;
+pub use bus::SpeedUnit;
+pub use bus::APTurnSide;

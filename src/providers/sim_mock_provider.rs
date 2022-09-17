@@ -50,7 +50,7 @@ impl SensorsProvider for SimMockSensorsProvider {
         println!("SimMock Provider acquire");
         SensorsValues::from(
             250f32,
-            10.000f32,
+            10_000f32,
             0.0f32,
             5.0f32,
             0.5f32,
