@@ -1,7 +1,7 @@
 
 pub mod autopilot {
 
-    use std::sync::{Arc, mpsc::Sender};
+    use std::sync::{Arc, mpsc::{Sender, Receiver}};
     use crate::{bus::{AdcDataMessage, APCmdMessage, BusMessage, APStateMessage, SpeedUnit}};
 
     use crate::{flight_ctrl::FlightCtrlsProvider};
@@ -10,16 +10,31 @@ pub mod autopilot {
 
         pub engaged: bool,
         pub flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync>,
-        pub ap_tx_gui: Sender<BusMessage>
+        pub rx_ap: Receiver<BusMessage>,
+        pub ap_tx_gui: Sender<BusMessage>,
     }
 
     impl Autopilot {
 
-        pub fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {
+        pub fn handle_bus_message(&mut self) {
+
+            match self.rx_ap.recv() {
+                Ok(bus_message) => {
+                    match bus_message {
+                        BusMessage::AdcData(adc_data) => self.handle_adc_data_message(adc_data),
+                        BusMessage::APCmd(ap_cmd) => self.handle_ap_cmd_message(ap_cmd),
+                        _ => (),
+                    };
+                },
+                Err(_) => println!("[AP] Message processing error")
+            }
+        }
+
+        fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {
             println!("[AP][DATA] {:?}", adc_data);
         }
 
-        pub fn handle_ap_cmd_message(&mut self, ap_cmd: APCmdMessage) {
+        fn handle_ap_cmd_message(&mut self, ap_cmd: APCmdMessage) {
             println!("[AP][APCMD] {:?}", ap_cmd);
 
             let ap_state: APStateMessage = APStateMessage{

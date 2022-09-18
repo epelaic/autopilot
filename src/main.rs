@@ -21,6 +21,7 @@ use crate::bus::{AdcDataMessage, BusMessage};
 use crate::sensors::SensorsProvider; 
 use crate::flight_ctrl::flight_ctrls::FlightCtrlsProvider; 
 use crate::providers::providers::Provider;
+use crate::gui::Gui;
 
 fn main() {
 
@@ -51,8 +52,23 @@ fn main() {
     let gui_tx_ap: Sender<BusMessage> = tx_ap.clone();
 
 
-    let adc: Adc = Adc{sensors: sensors};
-    let mut autopilot: Autopilot = Autopilot{engaged: false, flcs: flcs, ap_tx_gui: ap_tx_gui};
+    // Building ADC
+    let adc: Adc = Adc{
+        sensors: sensors, 
+        adc_tx_gui: adc_tx_gui, 
+        adc_tx_ap: adc_tx_ap};
+
+    // Builing AP
+    let mut autopilot: Autopilot = Autopilot{
+        engaged: false, 
+        flcs: flcs, 
+        rx_ap: rx_ap, 
+        ap_tx_gui: ap_tx_gui};
+
+    // Building GUI
+    let mut gui: Gui = Gui{
+        rx_gui: rx_gui, 
+        gui_tx_ap: gui_tx_ap};
 
     // Init Thread ADC
     let adc_handler = thread::spawn(move || -> ! {
@@ -60,16 +76,8 @@ fn main() {
         let d: Duration = Duration::from_millis(100);
         
         loop {
-            
-            let adc_registry: AdcRegistry = adc.get_frame();
-
-            let adc_data:AdcDataMessage = adc_registry.to_adc_data();
-            let gui_bus_message: BusMessage = BusMessage::AdcData(adc_data);
-            let ap_bus_message: BusMessage = gui_bus_message.clone();
-
-            println!("[ADC] sending data...");
-            adc_tx_gui.send(gui_bus_message).unwrap();
-            adc_tx_ap.send(ap_bus_message).unwrap();
+            // Read sensors and convert to ADC format
+            adc.read_sensors();
 
             thread::sleep(d);
         }
@@ -79,39 +87,17 @@ fn main() {
     let ap_handler = thread::spawn(move || -> ! {
         
         loop {
-
-            // Read Sensor Data or Handle GUI AP commands
-            match rx_ap.recv() {
-                Ok(message) => {
-                    match message {
-                        BusMessage::AdcData(adc_data) => autopilot.handle_adc_data_message(adc_data),
-                        BusMessage::APCmd(ap_cmd) => autopilot.handle_ap_cmd_message(ap_cmd),
-                        _ => (),
-                    }
-                },            
-                Err(_) => println!("[AP] Message processing error")
-            }
+            // Read ADC Data or Handle GUI AP commands
+            autopilot.handle_bus_message();
         }
     });
 
     // Init Thread GUI
     let gui_handler = thread::spawn(move || -> ! {
-
-        gui::gui_init();
         
         loop {
-
-            // Read Sensor Data or AP State
-            match rx_gui.recv() {
-                Ok(message) => {
-                    match message {
-                        BusMessage::AdcData(adc_data) => println!("[GUI][DATA] {:?}", adc_data),
-                        BusMessage::APState(ap_state) => println!("[GUI][APSTATE] {:?}", ap_state),
-                        _ => (),
-                    }
-                },            
-                Err(_) => println!("[GUI] Message processing error")
-            }
+            // Read ADC Data or AP State
+             gui.handle_bus_message();
         }
     });
 

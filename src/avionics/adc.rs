@@ -2,7 +2,9 @@
 pub mod adc {
 
     use std::sync::Arc;
+    use std::sync::mpsc::Sender;
 
+    use crate::bus::BusMessage;
     use crate::sensors::sensors::SensorsValues;
     
     /**
@@ -20,10 +22,26 @@ pub mod adc {
     use crate::{ sensors::SensorsProvider, bus::{AdcDataMessage} };
 
     pub struct  Adc {
-        pub sensors: Arc::<dyn SensorsProvider + Send + Sync>
+        pub sensors: Arc::<dyn SensorsProvider + Send + Sync>,
+        pub adc_tx_gui: Sender<BusMessage>,
+        pub adc_tx_ap: Sender<BusMessage>
     }
 
     impl Adc {
+
+        pub fn read_sensors(&self) {
+
+            let adc_registry: AdcRegistry = self.get_frame();
+
+            let adc_data:AdcDataMessage = adc_registry.to_adc_data();
+            let gui_bus_message: BusMessage = BusMessage::AdcData(adc_data);
+            let ap_bus_message: BusMessage = gui_bus_message.clone();
+
+            println!("[ADC] sending data...");
+            self.adc_tx_gui.send(gui_bus_message).unwrap();
+            self.adc_tx_ap.send(ap_bus_message).unwrap();
+
+        }
 
         pub fn get_frame(&self) -> AdcRegistry {
 
