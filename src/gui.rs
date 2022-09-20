@@ -9,6 +9,11 @@ pub mod gui {
     use std::{sync::{mpsc::{Sender, Receiver}, Arc, Mutex, MutexGuard}};
     use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
 
+    const ALT_MAX_VALUE: f32 = 40_000f32;
+    const ALT_MIN_VALUE: f32 = 0f32;
+    const ALT_100_INCREMENT: f32 = 100f32;
+    const ALT_500_INCREMENT: f32 = 500f32;
+
     pub struct GuiState {
         pub adc_state: AdcDataMessage,
         pub ap_state: APStateMessage,
@@ -28,6 +33,37 @@ pub mod gui {
         pub gui_tx_ap: Sender<BusMessage>,
     }
 
+    impl GuiApp {
+        
+        fn increment_value(&self, old_value: &mut f32, step: f32, max: f32) {
+
+            let mut new_value: f32 = *old_value + step;
+
+            if new_value > max {
+                new_value = max;
+            }
+
+            *old_value =  new_value;
+        }
+
+        fn decrement_value(&self, old_value: &mut f32, step: f32, min: f32) {
+
+            let mut new_value: f32 = *old_value - step;
+
+            if new_value < min {
+                new_value = min;
+            }
+
+            *old_value =  new_value;
+        }
+
+        fn send_ap_cmd(&self, ap_cmd_payload: APCmdPayload) {
+
+            let bus_message: BusMessage = BusMessage::APCmd(ap_cmd_payload);
+            let _ = self.gui_tx_ap.send(bus_message);
+        }
+    }
+
     impl eframe::App for GuiApp {
 
         fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -44,40 +80,28 @@ pub mod gui {
 
                     if ui.button("<<").clicked() {
     
-                        let new_value = state.ap_state.alt - 500f32;
-                        state.ap_state.alt = new_value;
-    
-                        let bus_message: BusMessage = BusMessage::APCmd(APCmdPayload::SetAlt(new_value));
-                        let _ = self.gui_tx_ap.send(bus_message);
+                        self.decrement_value(&mut state.ap_state.alt , ALT_500_INCREMENT, ALT_MIN_VALUE);
+                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
                     }
 
                     if ui.button("<").clicked() {
     
-                        let new_value = state.ap_state.alt - 100f32;
-                        state.ap_state.alt = new_value;
-    
-                        let bus_message: BusMessage = BusMessage::APCmd(APCmdPayload::SetAlt(new_value));
-                        let _ = self.gui_tx_ap.send(bus_message);
+                        self.decrement_value(&mut state.ap_state.alt , ALT_100_INCREMENT, ALT_MIN_VALUE);
+                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
                     }
 
                     ui.label(format!("AP alt: {}ft", state.ap_state.alt));
 
                     if ui.button(">").clicked() {
     
-                        let new_value = state.ap_state.alt + 100f32;
-                        state.ap_state.alt = new_value;
-    
-                        let bus_message: BusMessage = BusMessage::APCmd(APCmdPayload::SetAlt(new_value));
-                        let _ = self.gui_tx_ap.send(bus_message);
+                        self.increment_value(&mut state.ap_state.alt , ALT_100_INCREMENT, ALT_MAX_VALUE);
+                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
                     }
 
                     if ui.button(">>").clicked() {
     
-                        let new_value = state.ap_state.alt + 500f32;
-                        state.ap_state.alt = new_value;
-    
-                        let bus_message: BusMessage = BusMessage::APCmd(APCmdPayload::SetAlt(new_value));
-                        let _ = self.gui_tx_ap.send(bus_message);
+                        self.increment_value(&mut state.ap_state.alt , ALT_500_INCREMENT, ALT_MAX_VALUE);
+                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
                     }
 
                 });

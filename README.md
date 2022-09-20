@@ -10,7 +10,7 @@ Threads :
 * Main Tread : (config/init)
 * Adc Thread : Get sensors datas and forward to AP and GUI
 * Autopilot (AP) Thread : Process ADC DATA, Handle GUI AP commands and send AP state to GUI (if changed).
-* GUI Thread : Receive ADC Data and AP State end set to shared memory via Arc/Mutex.
+* GUI Thread : Receive ADC Data and AP State and set to shared memory via Arc/Mutex.
 * GuiApp Thread : Egui APP (frontend), Read shared memory state via Arc/Mutex, handle user's inputs and send AP configuration command to AP.
 
 
