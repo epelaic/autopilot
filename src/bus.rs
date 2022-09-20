@@ -6,7 +6,7 @@ pub mod bus {
     pub enum BusMessage {
         AdcData(AdcDataMessage),
         APState(APStateMessage),
-        APCmd(APCmdMessage)
+        APCmd(APCmdPayload)
     }
 
     // ADC Messages
@@ -21,6 +21,22 @@ pub mod bus {
         pub g_load: f32,
         pub pitch_angle: f32,
         pub roll_angle: f32,
+    }
+
+    impl AdcDataMessage {
+        
+        pub const fn new() -> Self {
+            Self {
+                ias: 0f32,
+                alt: 0f32,
+                vs: 0f32,
+                aoa: 0f32,
+                mach: 0f32,
+                g_load: 0f32,
+                pitch_angle: 0f32,
+                roll_angle: 0f32,
+            }
+        }
     }
 
     impl fmt::Display for AdcDataMessage {
@@ -52,13 +68,28 @@ pub mod bus {
         pub vs: f32,
     }
 
-    #[derive(Debug, Clone)]
-    pub struct APCmdMessage {
-        payload: APCmd
+    impl APStateMessage {
+
+        pub const fn new() -> Self {
+
+            Self{
+                engaged:false, 
+                alt_hold_mode: false,
+                vs_mode: false,
+                heading_mode: false,
+                auto_throttle_mode: false,
+                alt: 15_000f32,
+                heading: 180f32,
+                speed: 250f32,
+                speed_unit: SpeedUnit::IAS,
+                bank_angle: 10f32,
+                vs: 0f32
+            }
+        }
     }
 
     #[derive(Debug, Clone)]
-    pub enum  APCmd {
+    pub enum  APCmdPayload {
 
         APEngage(bool),
 
@@ -72,8 +103,8 @@ pub mod bus {
 
         SetHeading{ heading: u8, turn_side: APTurnSide },
         SetSpeed{ speed: f32, unit: SpeedUnit },
-        SetVs(u32),
-        SetAlt(u32),
+        SetVs(f32),
+        SetAlt(f32),
         SetBankAngle(i8)
 
     }
@@ -97,6 +128,6 @@ pub mod bus {
 pub use bus::BusMessage;
 pub use bus::AdcDataMessage;
 pub use bus::APStateMessage;
-pub use bus::APCmdMessage;
 pub use bus::SpeedUnit;
 pub use bus::APTurnSide;
+pub use bus::APCmdPayload;

@@ -1,3 +1,4 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 mod avionics;
 mod bus;
@@ -7,21 +8,23 @@ mod providers;
 mod sensors;
 
 extern crate yaml_rust;
+
 use std::env;
 use std::sync::mpsc::{Receiver, Sender};
-use std::sync::{mpsc, Arc};
-use std::thread;
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread::{self};
 use std::fs;
 use std::time::Duration;
+use gui::gui::GuiState;
 use yaml_rust::{YamlLoader, Yaml};
 
-use crate::avionics::adc::adc::{ AdcRegistry, Adc};
+use crate::avionics::adc::adc::{Adc};
 use crate::avionics::autopilot::autopilot::Autopilot;
-use crate::bus::{AdcDataMessage, BusMessage};
+use crate::bus::{BusMessage};
 use crate::sensors::SensorsProvider; 
 use crate::flight_ctrl::flight_ctrls::FlightCtrlsProvider; 
 use crate::providers::providers::Provider;
-use crate::gui::Gui;
+use crate::gui::{Gui, GuiApp};
 
 fn main() {
 
@@ -52,26 +55,37 @@ fn main() {
     let gui_tx_ap: Sender<BusMessage> = tx_ap.clone();
 
 
-    // Building ADC
+    // ----- Building ADC
     let adc: Adc = Adc{
         sensors: sensors, 
         adc_tx_gui: adc_tx_gui, 
         adc_tx_ap: adc_tx_ap};
 
-    // Builing AP
-    let mut autopilot: Autopilot = Autopilot{
-        engaged: false, 
-        flcs: flcs, 
-        rx_ap: rx_ap, 
-        ap_tx_gui: ap_tx_gui};
+    // ----- Builing AP
+    let mut autopilot: Autopilot = Autopilot::from(
+        flcs, 
+        rx_ap, 
+        ap_tx_gui);
+    
+    // ----- Building GUI
+    let gui_state_mutex: Mutex<GuiState> = Mutex::new(GuiState::new());
+    let gui_state: Arc<Mutex<GuiState>> = Arc::new(gui_state_mutex);
+    let gui_state2: Arc<Mutex<GuiState>>  = gui_state.clone();
+    
+    let gui_app: GuiApp = GuiApp{
+        state: gui_state,
+        gui_tx_ap: gui_tx_ap
+    };
 
-    // Building GUI
     let mut gui: Gui = Gui{
-        rx_gui: rx_gui, 
-        gui_tx_ap: gui_tx_ap};
+        state: gui_state2,
+        rx_gui: rx_gui,
+    };
 
-    // Init Thread ADC
-    let adc_handler = thread::spawn(move || -> ! {
+    let mut handles = vec![];
+
+    // ----- Init Thread ADC -----
+    let adc_handle = thread::spawn(move || -> ! {
 
         let d: Duration = Duration::from_millis(100);
         
@@ -82,29 +96,41 @@ fn main() {
             thread::sleep(d);
         }
     });
+    handles.push(adc_handle);
 
-    // Init Thread AP
-    let ap_handler = thread::spawn(move || -> ! {
+    // ----- Init Thread AP -----
+    let ap_handle = thread::spawn(move || -> ! {
         
         loop {
             // Read ADC Data or Handle GUI AP commands
             autopilot.handle_bus_message();
         }
     });
+    handles.push(ap_handle);
 
-    // Init Thread GUI
-    let gui_handler = thread::spawn(move || -> ! {
+    // ----- Init Thread GUI -----
+    let gui_handle = thread::spawn(move || -> ! {
         
         loop {
             // Read ADC Data or AP State
-             gui.handle_bus_message();
+            gui.handle_bus_message();
         }
     });
+    handles.push(gui_handle);
+
+    // Init Gui APP
+    let options = eframe::NativeOptions::default();
+    eframe::run_native(
+        "Autopilot",
+        options,
+        Box::new(|_cc| Box::new(gui_app)),
+    );
 
     println!("Autopilot ready");
 
-    adc_handler.join().expect("Adc handler error");
-    ap_handler.join().expect("AP handler error");
-    gui_handler.join().expect("GUI handler error");
+    // join the handles in the vector
+    for i in handles {
+        i.join().unwrap();
+    }
 
 }

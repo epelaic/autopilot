@@ -2,19 +2,31 @@
 pub mod autopilot {
 
     use std::sync::{Arc, mpsc::{Sender, Receiver}};
-    use crate::{bus::{AdcDataMessage, APCmdMessage, BusMessage, APStateMessage, SpeedUnit}};
+    use crate::{bus::{AdcDataMessage, BusMessage, APStateMessage, SpeedUnit, APCmdPayload}};
 
     use crate::{flight_ctrl::FlightCtrlsProvider};
 
     pub struct Autopilot {
 
-        pub engaged: bool,
+        pub ap_state: APStateMessage,
         pub flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync>,
         pub rx_ap: Receiver<BusMessage>,
         pub ap_tx_gui: Sender<BusMessage>,
     }
 
     impl Autopilot {
+
+        pub const fn from(
+            flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync>,
+            rx_ap: Receiver<BusMessage>,
+            ap_tx_gui: Sender<BusMessage>) -> Self {
+
+            Self { 
+                ap_state: APStateMessage::new(), 
+                flcs: flcs, 
+                rx_ap: rx_ap, 
+                ap_tx_gui: ap_tx_gui }
+        }
 
         pub fn handle_bus_message(&mut self) {
 
@@ -34,25 +46,34 @@ pub mod autopilot {
             println!("[AP][DATA] {:?}", adc_data);
         }
 
-        fn handle_ap_cmd_message(&mut self, ap_cmd: APCmdMessage) {
+        fn handle_ap_cmd_message(&mut self, ap_cmd: APCmdPayload) {
+
             println!("[AP][APCMD] {:?}", ap_cmd);
 
-            let ap_state: APStateMessage = APStateMessage{
-                engaged:false, 
-                alt_hold_mode: false,
-                vs_mode: false,
-                heading_mode: false,
-                auto_throttle_mode: false,
-                alt: 15_000f32,
-                heading: 180f32,
-                speed: 250f32,
-                speed_unit: SpeedUnit::IAS,
-                bank_angle: 10f32,
-                vs: 0f32
-            };
+            match ap_cmd {
+                APCmdPayload::SetAlt(alt) => self.set_ap_alt(alt),
+                _ => ()
+            }
+
+            let ap_state: APStateMessage = self.ap_state.clone();
 
             self.ap_tx_gui.send(BusMessage::APState(ap_state)).unwrap();
         }
+
+        fn set_ap_alt(&mut self, alt: f32) {
+
+            self.ap_state.alt = alt;
+
+            self.notify_observers();
+        }
+
+        // Notify GUI
+        fn notify_observers(&self) {
+
+            let ap_state: APStateMessage = self.ap_state.clone();
+            self.ap_tx_gui.send(BusMessage::APState(ap_state)).unwrap();
+        }
+
     }
 
 }
