@@ -15,9 +15,11 @@ GUI Thread : Display ADC Data and AP State, send AP configuration command to AP.
 
 MPSC channels configuration : 
 
+<pre>
 ADC-----[AdcDataMessage]------->AP------------------
  |                              ^                  |
  |                              |                  |
  |                         [APCmdMessage]  [APStateMessage]
  |                              |                  |
  |------[AdcDataMessage]------->GUI<----------------
+ </pre>
