@@ -24,7 +24,7 @@ ADC-----[AdcDataMessage]------->AP------------------------
  |                              |                        |
  |                            GuiApp (Egui)              |
  |                              |                        |
- |                   Arc::&lt;Mutex&lt;GuiState&gt;&gt;  |
+ |                   Arc::&lt;Mutex&lt;GuiState&gt;&gt;              |
  |                              ^                        |
  |                              |                        |
  |------[AdcDataMessage]------>Gui<----------------------|
