@@ -43,8 +43,8 @@ pub mod bus {
 
     impl fmt::Display for AdcDataMessage {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "ias: {}, alt: {}, vs: {}, aoa: {}, mach: {}, g_load: {}, pitch: {}, roll: {}", 
-            self.ias, self.alt, self.vs, self.aoa, self.mach, self.g_load, self.pitch_angle, self.roll_angle)
+            write!(f, "ias: {}, alt: {}, hdg: {}, vs: {}, aoa: {}, mach: {}, g_load: {}, pitch: {}, roll: {}", 
+            self.ias, self.alt, self.heading, self.vs, self.aoa, self.mach, self.g_load, self.pitch_angle, self.roll_angle)
         }
     }
 
