@@ -9,6 +9,8 @@ pub mod gui {
     use std::{sync::{mpsc::{Sender, Receiver}, Arc, Mutex, MutexGuard}};
     use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
 
+    use super::pfd::pfd_update;
+
     const ALT_MAX_VALUE: f32 = 40_000f32;
     const ALT_MIN_VALUE: f32 = 0f32;
     const ALT_100_INCREMENT: f32 = 100f32;
@@ -105,6 +107,8 @@ pub mod gui {
                     }
 
                 });
+
+                pfd_update(state, ctx, ui);
             });
         }
 

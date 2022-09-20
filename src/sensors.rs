@@ -9,6 +9,7 @@ pub mod sensors {
 
         pub ias: f32,
         pub alt: f32,
+        pub heading: f32,
         pub vs: f32,
         pub aoa: f32,
         pub mach: f32,
@@ -22,6 +23,7 @@ pub mod sensors {
             return SensorsValues {
                 ias: 0f32, 
                 alt: 0f32,
+                heading: 0f32,
                 vs: 0f32,
                 aoa: 0f32,
                 mach: 0f32,
@@ -32,6 +34,7 @@ pub mod sensors {
         pub const fn from(
                     ias: f32, 
                     alt: f32,
+                    heading: f32,
                     vs: f32,
                     aoa: f32,
                     mach: f32,
@@ -40,6 +43,7 @@ pub mod sensors {
             return SensorsValues {
                 ias: ias, 
                 alt: alt,
+                heading: heading,
                 vs: vs,
                 aoa: aoa,
                 mach: mach,

@@ -54,6 +54,7 @@ pub mod adc {
             AdcRegistry{
                 ias: s_values.ias,
                 alt: s_values.alt,
+                heading: s_values.heading,
                 vs: s_values.vs,
                 aoa: s_values.aoa,
                 mach: s_values.mach,
@@ -68,6 +69,7 @@ pub mod adc {
 
         ias: f32,
         alt: f32,
+        heading: f32,
         vs: f32,
         aoa: f32,
         mach: f32,
@@ -81,6 +83,7 @@ pub mod adc {
             return AdcRegistry {
                 ias: 0f32, 
                 alt: 0f32,
+                heading: 0f32,
                 vs: 0f32,
                 aoa: 0f32,
                 mach: 0f32,
@@ -93,6 +96,7 @@ pub mod adc {
             return AdcDataMessage{
                 ias: self.ias, 
                 alt: self.alt, 
+                heading: self.heading,
                 vs: self.vs, 
                 aoa: self.aoa, 
                 mach: self.mach, 

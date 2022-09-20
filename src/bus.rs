@@ -15,6 +15,7 @@ pub mod bus {
     pub struct AdcDataMessage {
         pub ias: f32,
         pub alt: f32,
+        pub heading: f32,
         pub vs: f32,
         pub aoa: f32,
         pub mach: f32,
@@ -29,6 +30,7 @@ pub mod bus {
             Self {
                 ias: 0f32,
                 alt: 0f32,
+                heading: 0f32,
                 vs: 0f32,
                 aoa: 0f32,
                 mach: 0f32,

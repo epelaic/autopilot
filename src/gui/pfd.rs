@@ -9,12 +9,23 @@
  */
 pub mod pfd {
 
-    pub fn pfd_init() {
+    use std::sync::MutexGuard;
 
-        println!("Start init pfd module");
+    use egui::Ui;
 
-        println!("End init pfd module");
+    use crate::gui::gui::GuiState;
+
+
+    pub fn pfd_update(state: MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
+
+        ui.horizontal(|ui| {
+
+            ui.label(format!("ALT: {}ft", state.adc_state.alt));
+            ui.label(format!("IAS: {}kts", state.adc_state.ias));
+            ui.label(format!("VS: {}ft/min", state.adc_state.vs));
+            ui.label(format!("HDG: {}", state.adc_state.heading));
+        });
     }
 }
 
-pub use pfd::pfd_init;
+pub use pfd::pfd_update;
