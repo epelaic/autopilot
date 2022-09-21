@@ -11,7 +11,7 @@ use std::sync::MutexGuard;
 use egui::Ui;
 use crate::bus::APCmdPayload;
 use crate::gui::gui::GuiState;
-use crate::gui::constants::{ALT_100_INCREMENT, ALT_500_INCREMENT, ALT_MAX_VALUE, ALT_MIN_VALUE};
+use crate::gui::constants::{ALT_100_STEP_VALUE, ALT_500_STEP_VALUE, ALT_MAX_VALUE, ALT_MIN_VALUE};
 use crate::gui::common::{decrement_value, increment_value};
 
 use super::common::APBusMessageSender;
@@ -26,13 +26,13 @@ impl AutopilotPanel {
 
             if ui.button("<<").clicked() {
 
-                decrement_value(&mut state.ap_state.alt , crate::gui::constants::ALT_500_INCREMENT, ALT_MIN_VALUE);
+                decrement_value(&mut state.ap_state.alt , crate::gui::constants::ALT_500_STEP_VALUE, ALT_MIN_VALUE);
                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
             }
 
             if ui.button("<").clicked() {
 
-                decrement_value(&mut state.ap_state.alt , ALT_100_INCREMENT, ALT_MIN_VALUE);
+                decrement_value(&mut state.ap_state.alt , ALT_100_STEP_VALUE, ALT_MIN_VALUE);
                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
             }
 
@@ -40,13 +40,13 @@ impl AutopilotPanel {
 
             if ui.button(">").clicked() {
 
-                increment_value(&mut state.ap_state.alt , ALT_100_INCREMENT, ALT_MAX_VALUE);
+                increment_value(&mut state.ap_state.alt , ALT_100_STEP_VALUE, ALT_MAX_VALUE);
                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
             }
 
             if ui.button(">>").clicked() {
 
-                increment_value(&mut state.ap_state.alt , ALT_500_INCREMENT, ALT_MAX_VALUE);
+                increment_value(&mut state.ap_state.alt , ALT_500_STEP_VALUE, ALT_MAX_VALUE);
                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
             }
 
