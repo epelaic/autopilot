@@ -20,7 +20,7 @@ pub struct AutopilotPanel {
 
 impl AutopilotPanel {
 
-    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui, ap_msg_sender: &dyn APBusMessageSender) {
+    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, _ctx: &egui::Context, ui: &mut Ui, ap_msg_sender: &dyn APBusMessageSender) {
 
         ui.horizontal(|ui| {
 

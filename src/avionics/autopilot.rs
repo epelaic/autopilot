@@ -2,7 +2,7 @@
 pub mod autopilot {
 
     use std::sync::{Arc, mpsc::{Sender, Receiver}};
-    use crate::{bus::{AdcDataMessage, BusMessage, APStateMessage, SpeedUnit, APCmdPayload}};
+    use crate::{bus::{AdcDataMessage, BusMessage, APStateMessage, APCmdPayload}};
 
     use crate::{flight_ctrl::FlightCtrlsProvider};
 

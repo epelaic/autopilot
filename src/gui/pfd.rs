@@ -19,7 +19,7 @@ pub struct PrimaryFligthDisplay { }
 
 impl PrimaryFligthDisplay {
 
-    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
+    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, _ctx: &egui::Context, ui: &mut Ui) {
 
         ui.horizontal(|ui| {
 

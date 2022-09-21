@@ -70,7 +70,7 @@ impl FlightCtrlsProvider for SimMockFlightCtrlsProvider {
     }
 }
 
-pub fn simmock_provider_init(config: &Yaml) -> Box<dyn Provider> {
+pub fn simmock_provider_init(_config: &Yaml) -> Box<dyn Provider> {
 
     println!("Start init simmock_provider module");
 
