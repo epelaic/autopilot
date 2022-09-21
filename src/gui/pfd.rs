@@ -7,16 +7,19 @@
  * - Pitch angle (deg)
  * - Vertical speed (feets/min)
  */
-pub mod pfd {
-
-    use std::sync::MutexGuard;
-
-    use egui::Ui;
-
-    use crate::gui::gui::GuiState;
 
 
-    pub fn pfd_update(state: MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
+use std::sync::MutexGuard;
+
+use egui::Ui;
+
+use crate::gui::gui::GuiState;
+
+pub struct PrimaryFligthDisplay { }
+
+impl PrimaryFligthDisplay {
+
+    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
 
         ui.horizontal(|ui| {
 
@@ -28,4 +31,4 @@ pub mod pfd {
     }
 }
 
-pub use pfd::pfd_update;
+

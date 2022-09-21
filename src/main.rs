@@ -72,10 +72,7 @@ fn main() {
     let gui_state: Arc<Mutex<GuiState>> = Arc::new(gui_state_mutex);
     let gui_state2: Arc<Mutex<GuiState>>  = gui_state.clone();
     
-    let gui_app: GuiApp = GuiApp{
-        state: gui_state,
-        gui_tx_ap: gui_tx_ap
-    };
+    let gui_app: GuiApp = GuiApp::from(gui_state, gui_tx_ap);
 
     let mut gui: Gui = Gui{
         state: gui_state2,

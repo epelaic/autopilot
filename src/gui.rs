@@ -1,4 +1,7 @@
 
+mod ap_panel;
+mod common;
+mod constants;
 mod pfd;
 
 extern crate egui;
@@ -8,8 +11,8 @@ pub mod gui {
 
     use std::{sync::{mpsc::{Sender, Receiver}, Arc, Mutex, MutexGuard}};
     use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
-
-    use super::pfd::pfd_update;
+    use crate::gui::common::APBusMessageSender;
+    use super::{pfd::PrimaryFligthDisplay, ap_panel::AutopilotPanel};
 
     const ALT_MAX_VALUE: f32 = 40_000f32;
     const ALT_MIN_VALUE: f32 = 0f32;
@@ -33,31 +36,24 @@ pub mod gui {
     pub struct GuiApp {
         pub state: Arc<Mutex<GuiState>>,
         pub gui_tx_ap: Sender<BusMessage>,
+        ap_panel: AutopilotPanel,
+        pfd: PrimaryFligthDisplay,
     }
 
     impl GuiApp {
-        
-        fn increment_value(&self, old_value: &mut f32, step: f32, max: f32) {
 
-            let mut new_value: f32 = *old_value + step;
+        pub const fn from(state: Arc<Mutex<GuiState>>, gui_tx_ap: Sender<BusMessage>) -> Self {
 
-            if new_value > max {
-                new_value = max;
+            Self { 
+                state: state, 
+                gui_tx_ap: gui_tx_ap, 
+                ap_panel: AutopilotPanel{}, 
+                pfd: PrimaryFligthDisplay {}
             }
-
-            *old_value =  new_value;
         }
+    }
 
-        fn decrement_value(&self, old_value: &mut f32, step: f32, min: f32) {
-
-            let mut new_value: f32 = *old_value - step;
-
-            if new_value < min {
-                new_value = min;
-            }
-
-            *old_value =  new_value;
-        }
+    impl APBusMessageSender for GuiApp {
 
         fn send_ap_cmd(&self, ap_cmd_payload: APCmdPayload) {
 
@@ -76,42 +72,10 @@ pub mod gui {
                 
                 ui.heading("Autopilot App");
 
-                //ui.label(format!("AP alt: {}", state.ap_state.alt));
-
-                ui.horizontal(|ui| {
-
-                    if ui.button("<<").clicked() {
-    
-                        self.decrement_value(&mut state.ap_state.alt , ALT_500_INCREMENT, ALT_MIN_VALUE);
-                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
-                    }
-
-                    if ui.button("<").clicked() {
-    
-                        self.decrement_value(&mut state.ap_state.alt , ALT_100_INCREMENT, ALT_MIN_VALUE);
-                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
-                    }
-
-                    ui.label(format!("AP alt: {}ft", state.ap_state.alt));
-
-                    if ui.button(">").clicked() {
-    
-                        self.increment_value(&mut state.ap_state.alt , ALT_100_INCREMENT, ALT_MAX_VALUE);
-                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
-                    }
-
-                    if ui.button(">>").clicked() {
-    
-                        self.increment_value(&mut state.ap_state.alt , ALT_500_INCREMENT, ALT_MAX_VALUE);
-                        self.send_ap_cmd(APCmdPayload::SetAlt(state.ap_state.alt));
-                    }
-
-                });
-
-                pfd_update(state, ctx, ui);
+                self.ap_panel.view_update(&mut state, ctx, ui, self);
+                self.pfd.view_update(&mut state, ctx, ui);
             });
         }
-
     }
 
     pub struct Gui {
