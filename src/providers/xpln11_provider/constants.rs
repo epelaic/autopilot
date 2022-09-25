@@ -1,5 +1,4 @@
 use num_derive::FromPrimitive;    
-use num_traits::FromPrimitive;
 
 #[derive(FromPrimitive)]
 pub enum XPLN11DataReadEnum {

@@ -9,7 +9,7 @@ extern crate egui;
 
 pub mod gui {
 
-    use std::{sync::{mpsc::{Sender, Receiver}, Arc, Mutex, MutexGuard}};
+    use std::{sync::{mpsc::{Sender, Receiver}, Arc, Mutex, MutexGuard}, time::Duration, thread};
     use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
     use crate::gui::common::APBusMessageSender;
     use super::{pfd::PrimaryFligthDisplay, ap_panel::AutopilotPanel};
@@ -70,6 +70,8 @@ pub mod gui {
                 self.ap_panel.view_update(&mut state, ctx, ui, self);
                 self.pfd.view_update(&mut state, ctx, ui);
             });
+
+            ctx.request_repaint();
         }
     }
 
@@ -82,6 +84,8 @@ pub mod gui {
 
         pub fn handle_bus_message(&mut self) {
 
+            let d: Duration = Duration::from_millis(50);
+
             match self.rx_gui.try_recv() {
                 Ok(bus_message) => {
                     match bus_message {
@@ -92,10 +96,12 @@ pub mod gui {
                 },
                 Err(_) => ()//println!("[GUI] Message processing error")
             }
+
+            thread::sleep(d);
         }
 
         fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {
-            println!("[GUI][DATA] {:?}", adc_data);
+            //println!("[GUI][DATA] {:?}", adc_data);
 
             let mut state: MutexGuard<GuiState> = self.state.lock().unwrap();
             state.adc_state = adc_data;

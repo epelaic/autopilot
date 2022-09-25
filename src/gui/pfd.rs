@@ -23,7 +23,7 @@ impl PrimaryFligthDisplay {
 
         ui.horizontal(|ui| {
 
-            ui.label(format!("ALT AGL: {}ft", state.adc_state.alt_agl));
+            ui.label(format!("ALT MSL: {}ft", state.adc_state.alt_msl));
             ui.label(format!("IAS: {}kts", state.adc_state.ias));
             ui.label(format!("VS: {}ft/min", state.adc_state.vs));
             ui.label(format!("HDG: {}", state.adc_state.heading));

@@ -37,7 +37,7 @@ pub mod adc {
             let gui_bus_message: BusMessage = BusMessage::AdcData(adc_data);
             let ap_bus_message: BusMessage = gui_bus_message.clone();
 
-            println!("[ADC] sending data...");
+            //println!("[ADC] sending data...");
             self.adc_tx_gui.send(gui_bus_message).unwrap();
             self.adc_tx_ap.send(ap_bus_message).unwrap();
 

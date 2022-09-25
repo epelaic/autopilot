@@ -5,6 +5,7 @@ pub mod sensors {
         fn acquire(&self) -> SensorsValues;
     }
 
+    #[derive(Debug, Clone)]
     pub struct SensorsValues {
 
         pub ias: f32,

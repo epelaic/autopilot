@@ -34,12 +34,14 @@ impl fmt::Display for XPLN11Error {
 
 impl Error for XPLN11Error {}
 
+#[derive(Debug, Clone)]
 struct XPLN11UDPDataMessage {
 
     prologue: String,
     data: HashMap<i32, XPLN11UDPDataFragment> 
 }
 
+#[derive(Debug, Clone)]
 struct XPLN11UDPDataFragment {
 
     index: i32,
@@ -158,9 +160,6 @@ impl XMPL11SensorsProvider {
         
         match decode_data(&number_of_bytes, buf) {
             Ok(message) => {
-
-                let (_key, data_frg1) = message.data.get_key_value(&0).unwrap();
-                println!("message index 0 data 1 : {}", data_frg1.data1);
                 return Ok(message)
             },
             Err(e) => return Err(e)
@@ -172,7 +171,7 @@ impl SensorsProvider for XMPL11SensorsProvider {
 
     // TODO refact to return Result<SensorsValues, Error>
     fn acquire(&self) -> SensorsValues {
-        println!("XPLN11 Provider acquire");
+        //println!("XPLN11 Provider acquire");
         
         let raw_data = self.get_data();
 
@@ -180,6 +179,8 @@ impl SensorsProvider for XMPL11SensorsProvider {
 
         match raw_data {
             Ok(message_data) => {
+
+                //println!("ENTRY DATA : {:?}", message_data);
 
                 for (key, value) in message_data.data {
 
@@ -215,13 +216,15 @@ impl SensorsProvider for XMPL11SensorsProvider {
                         Some(XPLN11DataReadEnum::ClimbStats) => {
                             result.vs = value.get_data_field(ClimbStatsEnum::VSpd as isize);
                         }
-                        _ => ()
+                        _ => println!("XPLN11 ACQUIRE DATA NOT MATCH ENUM : {}", key)
                     }
                 }
 
             },
-            Err(e) => ()
+            Err(e) => print!("XPLN11 ACQUIRE DATA ERROR : {:?}", e)
         }
+
+        //println!("MAPPED DATA : {:?}", result);
 
         result
     }

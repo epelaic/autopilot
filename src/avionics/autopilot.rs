@@ -43,7 +43,7 @@ pub mod autopilot {
         }
 
         fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {
-            println!("[AP][DATA] {:?}", adc_data);
+            //println!("[AP][DATA] {:?}", adc_data);
         }
 
         fn handle_ap_cmd_message(&mut self, ap_cmd: APCmdPayload) {
