@@ -156,7 +156,8 @@ impl XMPL11SensorsProvider {
 
         let mut buf:[u8; DATA_MESSAGE_BUFFER_SIZE_VALUE] = [0; DATA_MESSAGE_BUFFER_SIZE_VALUE];
         let socket: &UdpSocket = &self.socket;
-        let (number_of_bytes, _src) = socket.recv_from(&mut buf).unwrap();
+        //let (number_of_bytes, _src) = socket.recv_from(&mut buf).unwrap();
+        let (number_of_bytes) = socket.recv(&mut buf).unwrap();  //socket.recv_from(&mut buf).unwrap();
         
         match decode_data(&number_of_bytes, buf) {
             Ok(message) => {

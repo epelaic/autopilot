@@ -97,7 +97,7 @@ pub mod gui {
                 Err(_) => ()//println!("[GUI] Message processing error")
             }
 
-            thread::sleep(d);
+            //thread::sleep(d);
         }
 
         fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {

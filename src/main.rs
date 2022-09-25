@@ -84,7 +84,7 @@ fn main() {
     // ----- Init Thread ADC -----
     let adc_handle = thread::spawn(move || -> ! {
 
-        let d: Duration = Duration::from_millis(100);
+        let d: Duration = Duration::from_millis(30);
         
         loop {
             // Read sensors and convert to ADC format
