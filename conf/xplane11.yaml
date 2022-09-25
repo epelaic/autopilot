@@ -4,3 +4,5 @@ provider:
     host: 127.0.0.1
     read_port: 49003
     write_port: 49000
+adc:
+    frame_rate: 20

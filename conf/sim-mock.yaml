@@ -1,3 +1,5 @@
 
 provider: 
     name: simmock
+adc:
+    frame_rate: 20

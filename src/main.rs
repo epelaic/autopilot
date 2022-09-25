@@ -41,6 +41,9 @@ fn main() {
     let mut provider: Box::<dyn Provider> = providers::resolve_provider(&config);
     provider.init();
 
+    let adc_frame_rate = config["adc"]["frame_rate"].as_i64().unwrap() as u64;
+    println!("adc_frame_rate : {}", adc_frame_rate);
+
     let sensors: Arc::<dyn SensorsProvider + Send + Sync> = provider.get_sensors();
     let flcs: Arc::<dyn FlightCtrlsProvider + Send + Sync> = provider.get_flcs();
     
@@ -84,7 +87,7 @@ fn main() {
     // ----- Init Thread ADC -----
     let adc_handle = thread::spawn(move || -> ! {
 
-        let d: Duration = Duration::from_millis(30);
+        let d: Duration = Duration::from_millis(adc_frame_rate);
         
         loop {
             // Read sensors and convert to ADC format
