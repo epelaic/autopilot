@@ -31,22 +31,23 @@ pub mod adc {
 
         pub fn read_sensors(&self) {
 
-            let adc_registry: AdcRegistry = self.get_frame();
+            match self.sensors.acquire() {
+                Ok(s_values) => {
 
-            let adc_data:AdcDataMessage = adc_registry.to_adc_data();
-            let gui_bus_message: BusMessage = BusMessage::AdcData(adc_data);
-            let ap_bus_message: BusMessage = gui_bus_message.clone();
+                    let adc_registry: AdcRegistry = self.apply_sensors_values(s_values);
 
-            //println!("[ADC] sending data...");
-            self.adc_tx_gui.send(gui_bus_message).unwrap();
-            self.adc_tx_ap.send(ap_bus_message).unwrap();
+                    let adc_data:AdcDataMessage = adc_registry.to_adc_data();
+                    let gui_bus_message: BusMessage = BusMessage::AdcData(adc_data);
+                    let ap_bus_message: BusMessage = gui_bus_message.clone();
+        
+                    //println!("[ADC] sending data...");
+                    self.adc_tx_gui.send(gui_bus_message).unwrap();
+                    self.adc_tx_ap.send(ap_bus_message).unwrap();
 
-        }
+                },
+                Err(e) => println!("Acquire error : {:?}", e)
+            }
 
-        pub fn get_frame(&self) -> AdcRegistry {
-
-            let s_values: SensorsValues = self.sensors.acquire();
-            self.apply_sensors_values(s_values)
         }
 
         fn apply_sensors_values(&self, s_values: SensorsValues) -> AdcRegistry {

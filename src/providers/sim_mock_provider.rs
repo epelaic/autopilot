@@ -46,9 +46,9 @@ struct SimMockSensorsProvider {
 
 impl SensorsProvider for SimMockSensorsProvider {
 
-    fn acquire(&self) -> SensorsValues {
-        println!("SimMock Provider acquire");
-        SensorsValues::from(
+    fn acquire(&self) -> Result<SensorsValues, Box<dyn std::error::Error>> {
+        //println!("SimMock Provider acquire");
+        let result = SensorsValues::from(
             250f32,
             10_000f32,
             10_000f32,
@@ -59,7 +59,9 @@ impl SensorsProvider for SimMockSensorsProvider {
             1.0f32,
             5f32,
             0f32,
-            0f32)
+            0f32);
+        
+        Ok(result)
     }
 }
 

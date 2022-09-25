@@ -9,7 +9,7 @@ extern crate egui;
 
 pub mod gui {
 
-    use std::{sync::{mpsc::{Sender, Receiver}, Arc, Mutex, MutexGuard}, time::Duration, thread};
+    use std::{sync::{mpsc::{Sender, Receiver, TryRecvError}, Arc, Mutex, MutexGuard}, time::Duration, thread, io::Empty};
     use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
     use crate::gui::common::APBusMessageSender;
     use super::{pfd::PrimaryFligthDisplay, ap_panel::AutopilotPanel};
@@ -94,7 +94,12 @@ pub mod gui {
                         _ => (),
                     };           
                 },
-                Err(_) => ()//println!("[GUI] Message processing error")
+                Err(e) => {
+                    match e {
+                        TryRecvError::Empty => (),
+                        TryRecvError::Disconnected => println!("[GUI] Message processing error : {:?}", e)
+                    }   
+                }
             }
 
             //thread::sleep(d);

@@ -1,7 +1,7 @@
 
 pub mod autopilot {
 
-    use std::sync::{Arc, mpsc::{Sender, Receiver}};
+    use std::sync::{Arc, mpsc::{Sender, Receiver, TryRecvError}};
     use crate::{bus::{AdcDataMessage, BusMessage, APStateMessage, APCmdPayload}};
 
     use crate::{flight_ctrl::FlightCtrlsProvider};
@@ -30,7 +30,7 @@ pub mod autopilot {
 
         pub fn handle_bus_message(&mut self) {
 
-            match self.rx_ap.recv() {
+            match self.rx_ap.try_recv() {
                 Ok(bus_message) => {
                     match bus_message {
                         BusMessage::AdcData(adc_data) => self.handle_adc_data_message(adc_data),
@@ -38,7 +38,12 @@ pub mod autopilot {
                         _ => (),
                     };
                 },
-                Err(_) => println!("[AP] Message processing error")
+                Err(e) => {
+                    match e {
+                        TryRecvError::Empty => (),
+                        TryRecvError::Disconnected => println!("[AP] Message processing error : {:?}", e)
+                    }   
+                }
             }
         }
 

@@ -156,14 +156,19 @@ impl XMPL11SensorsProvider {
 
         let mut buf:[u8; DATA_MESSAGE_BUFFER_SIZE_VALUE] = [0; DATA_MESSAGE_BUFFER_SIZE_VALUE];
         let socket: &UdpSocket = &self.socket;
-        //let (number_of_bytes, _src) = socket.recv_from(&mut buf).unwrap();
-        let (number_of_bytes) = socket.recv(&mut buf).unwrap();  //socket.recv_from(&mut buf).unwrap();
         
-        match decode_data(&number_of_bytes, buf) {
-            Ok(message) => {
-                return Ok(message)
+        //let (number_of_bytes, _src) = socket.recv_from(&mut buf).unwrap();
+        match socket.recv(&mut buf)  {
+            Ok(number_of_bytes) => {
+
+                match decode_data(&number_of_bytes, buf) {
+                    Ok(message) => {
+                        return Ok(message)
+                    },
+                    Err(e) => return Err(e)
+                }
             },
-            Err(e) => return Err(e)
+            Err(e) => Err(Box::new(XPLN11Error(e.to_string()))),
         }
     }
 }
@@ -171,7 +176,7 @@ impl XMPL11SensorsProvider {
 impl SensorsProvider for XMPL11SensorsProvider {
 
     // TODO refact to return Result<SensorsValues, Error>
-    fn acquire(&self) -> SensorsValues {
+    fn acquire(&self) -> Result<SensorsValues,Box<dyn std::error::Error>> {
         //println!("XPLN11 Provider acquire");
         
         let raw_data = self.get_data();
@@ -199,13 +204,12 @@ impl SensorsProvider for XMPL11SensorsProvider {
                             result.pitch = value.get_data_field(PitchRollHeadingsEnum::Pitch as isize);
                             result.roll = value.get_data_field(PitchRollHeadingsEnum::Roll as isize);
                             result.yaw = value.get_data_field(PitchRollHeadingsEnum::Heading as isize);
+                            result.heading = value.get_data_field(PitchRollHeadingsEnum::HeadingMag as isize);
                         },
                         Some(XPLN11DataReadEnum::AoA) => {
                             result.aoa = value.get_data_field(AoAEnum::Alpha as isize);
                         },
-                        Some(XPLN11DataReadEnum::MagCompass) => {
-                            result.heading = value.get_data_field(MagCompassEnum::Mag as isize);
-                        },
+                        Some(XPLN11DataReadEnum::MagCompass) => (),
                         Some(XPLN11DataReadEnum::Gnss) => {
                             result.alt_msl = value.get_data_field(GnssEnum::AltitudeFtMSL as isize);
                             result.alt_agl = value.get_data_field(GnssEnum::AltitudeFtAGL as isize);
@@ -221,13 +225,14 @@ impl SensorsProvider for XMPL11SensorsProvider {
                     }
                 }
 
+                return Ok(result);
+
             },
-            Err(e) => print!("XPLN11 ACQUIRE DATA ERROR : {:?}", e)
+            Err(e) => return Err(e)
         }
 
         //println!("MAPPED DATA : {:?}", result);
 
-        result
     }
 }
 

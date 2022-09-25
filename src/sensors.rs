@@ -2,7 +2,7 @@ pub mod sensors {
 
     pub trait  SensorsProvider {
 
-        fn acquire(&self) -> SensorsValues;
+        fn acquire(&self) -> Result<SensorsValues,Box<dyn std::error::Error>> ;
     }
 
     #[derive(Debug, Clone)]
