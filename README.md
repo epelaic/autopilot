@@ -66,6 +66,7 @@ Index, Data, Data fields (8 data field for each data index, value = -999 => no d
 | 26, Throttle (actual)                 | thro1 (part)| thro2 (part) |              |             |              |              |              |             |
 | 41, N1                                | N1  1 (pcnt)| N1  2 (pcnt) |              |             |              |              |              |             |
 | 42, N2                                | N2  1 (pcnt)| N2  2 (pcnt) |              |             |              |              |              |             |
+| 132, Climb stats                      | h-spd (kt)  | v-spd (fpm)  |              | mult (VxVVI)|              |              |              |             |
 |---------------------------------------|-------------|--------------|--------------|-------------|--------------|--------------|--------------|-------------|
 </pre>
 Write DataRef : 

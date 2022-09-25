@@ -53,12 +53,15 @@ pub mod adc {
 
             AdcRegistry{
                 ias: s_values.ias,
-                alt: s_values.alt,
+                alt_msl: s_values.alt_msl,
+                alt_agl: s_values.alt_agl,
                 heading: s_values.heading,
                 vs: s_values.vs,
                 aoa: s_values.aoa,
                 mach: s_values.mach,
-                g_load: s_values.g_load    
+                g_load: s_values.g_load,
+                pitch: s_values.pitch,
+                roll: s_values.roll
             }
         }
 
@@ -68,12 +71,15 @@ pub mod adc {
     pub struct AdcRegistry {
 
         ias: f32,
-        alt: f32,
+        alt_msl: f32,
+        alt_agl: f32,
         heading: f32,
         vs: f32,
         aoa: f32,
         mach: f32,
-        g_load: f32
+        g_load: f32,
+        pitch: f32,
+        roll: f32
     }
 
     impl AdcRegistry {
@@ -82,12 +88,15 @@ pub mod adc {
 
             return AdcRegistry {
                 ias: 0f32, 
-                alt: 0f32,
+                alt_msl: 0f32,
+                alt_agl: 0f32,
                 heading: 0f32,
                 vs: 0f32,
                 aoa: 0f32,
                 mach: 0f32,
                 g_load: 0f32,
+                pitch: 0f32,
+                roll: 0f32
             };
         }
 
@@ -95,14 +104,15 @@ pub mod adc {
 
             return AdcDataMessage{
                 ias: self.ias, 
-                alt: self.alt, 
+                alt_msl: self.alt_msl,
+                alt_agl: self.alt_agl, 
                 heading: self.heading,
                 vs: self.vs, 
                 aoa: self.aoa, 
                 mach: self.mach, 
                 g_load: self.g_load, 
-                pitch_angle: 0f32, 
-                roll_angle: 0f32
+                pitch_angle: self.pitch, 
+                roll_angle: self.roll
             };
         }
     }

@@ -126,8 +126,8 @@ fn main() {
     println!("Autopilot ready");
 
     // join the handles in the vector
-    for i in handles {
-        i.join().unwrap();
-    }
+    //for i in handles {
+    //    i.join().unwrap();
+    //}
 
 }

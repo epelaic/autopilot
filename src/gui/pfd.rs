@@ -23,10 +23,12 @@ impl PrimaryFligthDisplay {
 
         ui.horizontal(|ui| {
 
-            ui.label(format!("ALT: {}ft", state.adc_state.alt));
+            ui.label(format!("ALT AGL: {}ft", state.adc_state.alt_agl));
             ui.label(format!("IAS: {}kts", state.adc_state.ias));
             ui.label(format!("VS: {}ft/min", state.adc_state.vs));
             ui.label(format!("HDG: {}", state.adc_state.heading));
+            ui.label(format!("Pitch: {}", state.adc_state.pitch_angle));
+            ui.label(format!("Roll: {}", state.adc_state.roll_angle));
         });
     }
 }

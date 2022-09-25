@@ -14,7 +14,8 @@ pub mod bus {
     #[derive(Debug, Clone)]
     pub struct AdcDataMessage {
         pub ias: f32,
-        pub alt: f32,
+        pub alt_msl: f32,
+        pub alt_agl: f32,
         pub heading: f32,
         pub vs: f32,
         pub aoa: f32,
@@ -29,7 +30,8 @@ pub mod bus {
         pub const fn new() -> Self {
             Self {
                 ias: 0f32,
-                alt: 0f32,
+                alt_msl: 0f32,
+                alt_agl: 0f32,
                 heading: 0f32,
                 vs: 0f32,
                 aoa: 0f32,
@@ -43,8 +45,8 @@ pub mod bus {
 
     impl fmt::Display for AdcDataMessage {
         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "ias: {}, alt: {}, hdg: {}, vs: {}, aoa: {}, mach: {}, g_load: {}, pitch: {}, roll: {}", 
-            self.ias, self.alt, self.heading, self.vs, self.aoa, self.mach, self.g_load, self.pitch_angle, self.roll_angle)
+            write!(f, "ias: {}, alt MSL: {}, alt AGL: {}, hdg: {}, vs: {}, aoa: {}, mach: {}, g_load: {}, pitch: {}, roll: {}", 
+            self.ias, self.alt_msl, self.alt_agl, self.heading, self.vs, self.aoa, self.mach, self.g_load, self.pitch_angle, self.roll_angle)
         }
     }
 

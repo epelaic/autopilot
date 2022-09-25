@@ -51,11 +51,15 @@ impl SensorsProvider for SimMockSensorsProvider {
         SensorsValues::from(
             250f32,
             10_000f32,
+            10_000f32,
             180f32,
             0.0f32,
             5.0f32,
             0.5f32,
-            1.0f32)
+            1.0f32,
+            5f32,
+            0f32,
+            0f32)
     }
 }
 

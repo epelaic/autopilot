@@ -1,22 +1,27 @@
 
+mod constants;
+
+use num_traits::FromPrimitive;
 use yaml_rust::Yaml;
 use std::error::Error;
 use std::sync::Arc;
-use std::{fmt, thread};
+use std::fmt;
 use std::collections::HashMap;
 use std::time::Duration;
 use std::net::UdpSocket;
-use crate::sensors::SensorsProvider;
+use crate::{sensors::SensorsProvider, providers::xpln11_provider::constants::GnssEnum};
 use crate::flight_ctrl::FlightCtrlsProvider;
 use crate::sensors::sensors::SensorsValues;
 use super::providers::Provider;
-
+use crate::providers::xpln11_provider::constants::{XPLN11DataReadEnum, SpeedsEnum, MachVVIGloadEnum, AoAEnum, PitchRollHeadingsEnum, ClimbStatsEnum, MagCompassEnum};
 
 const NAME: &str = "XPLN11";
 const DATA_MESSAGE_BUFFER_SIZE_VALUE:usize = 1024;
 const DATA_MESSAGE_MIN_BYTES_SIZE_VALUE:usize = 9;
+const DATA_MESSAGE_NO_DATA: f32 = -999f32;
 const DATA_MESSAGE_READ_TIMEOUT_VALUE:Duration = Duration::from_millis(100);
 const DATA_MESSAGE_WRITE_TIMEOUT_VALUE:Duration = Duration::from_millis(100);
+
 
 #[derive(Debug)]
 struct XPLN11Error(String);
@@ -46,6 +51,24 @@ struct XPLN11UDPDataFragment {
     data6: f32,
     data7: f32,
     data8: f32,
+}
+
+impl XPLN11UDPDataFragment {
+
+    fn get_data_field(&self, index: isize) -> f32 {
+
+        match index {
+            0 => return self.data1,
+            1 => return self.data2,
+            2 => return self.data3,
+            3 => return self.data4,
+            4 => return self.data5,
+            5 => return self.data6,
+            6 => return self.data7,
+            7 => return self.data8,
+            _ => return DATA_MESSAGE_NO_DATA
+        }
+    }
 }
 
 pub struct XPLN11Provider {
@@ -147,11 +170,60 @@ impl XMPL11SensorsProvider {
 
 impl SensorsProvider for XMPL11SensorsProvider {
 
+    // TODO refact to return Result<SensorsValues, Error>
     fn acquire(&self) -> SensorsValues {
         println!("XPLN11 Provider acquire");
-        let _raw_data = self.get_data();
+        
+        let raw_data = self.get_data();
 
-        SensorsValues::new()
+        let mut result: SensorsValues = SensorsValues::new();
+
+        match raw_data {
+            Ok(message_data) => {
+
+                for (key, value) in message_data.data {
+
+                    match FromPrimitive::from_i32(key) {
+                        Some(XPLN11DataReadEnum::Frame) => (),
+                        Some(XPLN11DataReadEnum::Speeds) => {
+                            result.ias = value.get_data_field(SpeedsEnum::Kias as isize);
+                        },
+                        Some(XPLN11DataReadEnum::MachVviGLoad) => {
+                            result.mach = value.get_data_field(MachVVIGloadEnum::Mach as isize);
+                            result.g_load = value.get_data_field(MachVVIGloadEnum::GloadNorm as isize);
+                        },
+                        Some(XPLN11DataReadEnum::JoystickYoke) => (),
+                        Some(XPLN11DataReadEnum::PitchRollHeadings) => {
+                            result.pitch = value.get_data_field(PitchRollHeadingsEnum::Pitch as isize);
+                            result.roll = value.get_data_field(PitchRollHeadingsEnum::Roll as isize);
+                            result.yaw = value.get_data_field(PitchRollHeadingsEnum::Heading as isize);
+                        },
+                        Some(XPLN11DataReadEnum::AoA) => {
+                            result.aoa = value.get_data_field(AoAEnum::Alpha as isize);
+                        },
+                        Some(XPLN11DataReadEnum::MagCompass) => {
+                            result.heading = value.get_data_field(MagCompassEnum::Mag as isize);
+                        },
+                        Some(XPLN11DataReadEnum::Gnss) => {
+                            result.alt_msl = value.get_data_field(GnssEnum::AltitudeFtMSL as isize);
+                            result.alt_agl = value.get_data_field(GnssEnum::AltitudeFtAGL as isize);
+                        },
+                        Some(XPLN11DataReadEnum::ThrottleCmd) => (),
+                        Some(XPLN11DataReadEnum::ThrottleActual) => (),
+                        Some(XPLN11DataReadEnum::N1) => (),
+                        Some(XPLN11DataReadEnum::N2) => (),
+                        Some(XPLN11DataReadEnum::ClimbStats) => {
+                            result.vs = value.get_data_field(ClimbStatsEnum::VSpd as isize);
+                        }
+                        _ => ()
+                    }
+                }
+
+            },
+            Err(e) => ()
+        }
+
+        result
     }
 }
 
