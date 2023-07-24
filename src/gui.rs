@@ -1,5 +1,6 @@
 
 mod ap_panel;
+mod attitude_indicator;
 mod common;
 mod constants;
 mod pfd;
@@ -10,6 +11,10 @@ extern crate egui;
 pub mod gui {
 
     use std::{sync::{mpsc::{Sender, Receiver, TryRecvError}, Arc, Mutex, MutexGuard}, time::Duration, thread, io::Empty};
+    use egui::text::FontDefinitions;
+    use egui::text::FontData;
+    use egui::text::FontFamily;
+
     use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
     use crate::gui::common::APBusMessageSender;
     use super::{pfd::PrimaryFligthDisplay, ap_panel::AutopilotPanel};

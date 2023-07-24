@@ -11,15 +11,16 @@
 
 use std::sync::MutexGuard;
 
-use egui::Ui;
+use egui::{Ui, Pos2};
 
+use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
 
 pub struct PrimaryFligthDisplay { }
 
 impl PrimaryFligthDisplay {
 
-    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, _ctx: &egui::Context, ui: &mut Ui) {
+    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
 
         ui.vertical(|ui| {
 
@@ -42,6 +43,13 @@ impl PrimaryFligthDisplay {
             ui.label(format!("Roll: {}", roll));
             ui.label(format!("AoA: {:.1}", aoa));
             ui.label(format!("G load: {:.1}", g_load));
+
+            let attitude_indicator: AttitudeIndicator = AttitudeIndicator::new(
+                Pos2{x: 250.0, y: 250.0},
+                300.0,
+                300.0);
+
+            attitude_indicator.view_update(state, ctx, ui);
         });
     }
 }

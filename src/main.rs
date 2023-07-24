@@ -118,6 +118,8 @@ fn main() {
     });
     handles.push(gui_handle);
 
+    println!("Autopilot ready");
+
     // Init Gui APP
     let options = eframe::NativeOptions::default();
     eframe::run_native(
@@ -125,8 +127,6 @@ fn main() {
         options,
         Box::new(|_cc| Box::new(gui_app)),
     );
-
-    println!("Autopilot ready");
 
     // join the handles in the vector
     //for i in handles {
