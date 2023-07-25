@@ -201,6 +201,8 @@ impl AttitudeIndicator {
             }
         }
 
+        self.draw_bank_angle_ref(ui, rotation_axis, roll_angle_in_radians);
+
         // Draw axis rotation circle ref (debug purposes)
         //cliped_painter.add(Shape::circle_filled(rotation_axis, 10.0, Color32::GREEN));
 
@@ -231,6 +233,51 @@ impl AttitudeIndicator {
         cliped_painter.add(text_shape);
         
         
+    }
+
+    fn draw_bank_angle_ref(&self, ui: &mut Ui, rotation_axis: Pos2, roll_angle_in_radians: f32) {
+
+        // 0° reverse triangle
+        let mut trg: Vec<Pos2> = Vec::new();
+        trg.push(Pos2{x: self.x_middle_pos - 15.0, y: self.box_min_y});
+        trg.push(Pos2{x: self.x_middle_pos + 15.0, y: self.box_min_y});
+        trg.push(Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0});
+
+        let trg_shape: PathShape = PathShape { points: trg, closed: true, fill: Color32::WHITE, stroke: Stroke::NONE };
+        ui.painter().add(trg_shape);
+
+        // Bank angle triangle attitude
+        let mut bank: Vec<Pos2> = Vec::new();
+        bank.push(Pos2{x: self.x_middle_pos - 15.0, y: self.box_min_y + 30.0});
+        bank.push(Pos2{x: self.x_middle_pos + 15.0, y: self.box_min_y + 30.0});
+        bank.push(Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0});
+
+        AttitudeIndicator::rotate_vec_pos2(rotation_axis, roll_angle_in_radians * -1.0, &mut bank);
+
+        let bank_shape: PathShape = PathShape { points: bank, closed: true, fill: Color32::YELLOW, stroke: Stroke::NONE };
+        ui.painter().add(bank_shape);
+
+        // +10° line
+        let line_small: [Pos2; 2] = [Pos2{x: self.x_middle_pos, y: self.box_min_y + 7.5}, Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0}];
+        let line_big: [Pos2; 2] = [Pos2{x: self.x_middle_pos, y: self.box_min_y}, Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0}];
+
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), 10.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), -10.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), 20.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), -20.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_big.to_owned(), 30.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_big.to_owned(), -30.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), 45.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), -45.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), 60.0);
+        self.draw_rotated_line(ui, rotation_axis, &mut line_small.to_owned(), -60.0);
+
+    }
+
+    fn draw_rotated_line(&self, ui: &mut Ui, rotation_axis: Pos2, points: &mut [Pos2; 2], angle_in_degrees: f32) {
+
+        AttitudeIndicator::rotate_line(rotation_axis, rust_math::trigonometry::deg2rad(angle_in_degrees), points);
+        ui.painter().add(Shape::line(points.to_vec(), Stroke { width: 2.0, color: Color32::WHITE }));
     }
 
     fn get_middle_pos(position_min: f32, width_or_height:f32) -> f32 {
