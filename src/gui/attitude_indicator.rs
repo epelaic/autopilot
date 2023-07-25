@@ -3,7 +3,7 @@
 use std::sync::{MutexGuard, Arc};
 
 use egui::{Align2, Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding, FontId,
-    epaint::RectShape, epaint::Rect, epaint::TextShape, epaint::text::Fonts, epaint::text::FontFamily, epaint::text::FontDefinitions, FontData, text::LayoutJob, Galley};
+    epaint::RectShape, epaint::Rect, epaint::TextShape, epaint::text::Fonts, epaint::text::FontFamily, epaint::{text::FontDefinitions, CubicBezierShape}, FontData, text::LayoutJob, Galley};
 use eframe::{emath::align::Align, epaint::PathShape};
 
 use crate::gui::gui::GuiState;
@@ -237,7 +237,42 @@ impl AttitudeIndicator {
 
     fn draw_bank_angle_ref(&self, ui: &mut Ui, rotation_axis: Pos2, roll_angle_in_radians: f32) {
 
-        // 0° reverse triangle
+        // Blue background
+        let base_point: Pos2 = Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0};
+        let mut bgr: Vec<Pos2> = Vec::new();
+        bgr.push(base_point.to_owned());
+
+        let agl_p: Vec<f32> = [10.0, 20.0, 30.0, 45.0, 60.0].to_vec();
+
+        for a in agl_p.iter() {
+            let base_p: &mut Pos2 = &mut base_point.to_owned();
+            let angle_in_radians: f32 = rust_math::trigonometry::deg2rad(*a);
+            let r: (f32, f32) = AttitudeIndicator::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
+            bgr.push(Pos2{x: r.0, y: r.1});
+        }
+
+        // 60° left border
+        bgr.push(Pos2{x: self.box_min_x, y: self.box_min_y + 60.0 });
+        // Top left corner
+        bgr.push(Pos2{x: self.box_min_x, y: self.box_min_y });
+        // Top rigth corner
+        bgr.push(Pos2{x: self.box_max_x, y: self.box_min_y });
+        // 60° right border
+        bgr.push(Pos2{x: self.box_max_x, y: self.box_min_y + 60.0 });
+
+        let agl_n: Vec<f32> = [-60.0, -45.0, -30.0, -20.0, -10.0].to_vec();
+
+        for a in agl_n.iter() {
+            let base_p: &mut Pos2 = &mut base_point.to_owned();
+            let angle_in_radians: f32 = rust_math::trigonometry::deg2rad(*a);
+            let r: (f32, f32) = AttitudeIndicator::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
+            bgr.push(Pos2{x: r.0, y: r.1});
+        }
+
+        let bgr_shape: PathShape = PathShape { points: bgr, closed: true, fill: Color32::BLUE, stroke: Stroke{ width: 2.0, color: Color32::BLUE } };
+        ui.painter().add(bgr_shape);
+
+        // 0° reverse triangle reference
         let mut trg: Vec<Pos2> = Vec::new();
         trg.push(Pos2{x: self.x_middle_pos - 15.0, y: self.box_min_y});
         trg.push(Pos2{x: self.x_middle_pos + 15.0, y: self.box_min_y});
@@ -252,7 +287,7 @@ impl AttitudeIndicator {
         bank.push(Pos2{x: self.x_middle_pos + 15.0, y: self.box_min_y + 30.0});
         bank.push(Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0});
 
-        AttitudeIndicator::rotate_vec_pos2(rotation_axis, roll_angle_in_radians * -1.0, &mut bank);
+        AttitudeIndicator::rotate_vec_pos2(rotation_axis, roll_angle_in_radians, &mut bank);
 
         let bank_shape: PathShape = PathShape { points: bank, closed: true, fill: Color32::YELLOW, stroke: Stroke::NONE };
         ui.painter().add(bank_shape);
