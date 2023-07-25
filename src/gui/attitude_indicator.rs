@@ -126,14 +126,14 @@ impl AttitudeIndicator {
 
     fn draw_aircraft_attitude(&self, ui: &mut Ui, ctx: &egui::Context, roll_angle: f32, pitch_angle: f32, cliped_painter: Painter) {
 
-        let roll_angle_in_radians: f32 = rust_math::trigonometry::deg2rad(roll_angle) * -1.0;
+        let roll_angle_in_radians: f32 = rust_math::trigonometry::deg2rad(roll_angle);
         let view_visible_angles: f32 = 60.0;
 
         // Calc y offet pitch
         let pitch_line_y_offset: f32 = pitch_angle * self.height / view_visible_angles;
         let pitch_line_y_pos: f32 = pitch_line_y_offset + self.y_middle_pos;
 
-        let rotation_axis: Pos2 = Pos2 { x: self.x_middle_pos, y: pitch_line_y_pos };
+        let rotation_axis: Pos2 = Pos2 { x: self.x_middle_pos, y: self.y_middle_pos };
 
         // Draw ground attitude
         let ground_rect: RectShape = RectShape { 
