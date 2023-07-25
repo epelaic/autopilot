@@ -11,13 +11,41 @@ extern crate egui;
 pub mod gui {
 
     use std::{sync::{mpsc::{Sender, Receiver, TryRecvError}, Arc, Mutex, MutexGuard}, time::Duration, thread, io::Empty};
-    use egui::text::FontDefinitions;
-    use egui::text::FontData;
-    use egui::text::FontFamily;
 
-    use crate::{bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage}};
+    use crate::bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage};
     use crate::gui::common::APBusMessageSender;
     use super::{pfd::PrimaryFligthDisplay, ap_panel::AutopilotPanel};
+
+    fn setup_custom_fonts(ctx: &egui::Context) {
+        // Start with the default fonts (we will be adding to them rather than replacing them).
+        let mut fonts = egui::FontDefinitions::default();
+    
+        // Install my own font (maybe supporting non-latin characters).
+        // .ttf and .otf files supported.
+        fonts.font_data.insert(
+            "FreeMono".to_owned(),
+            egui::FontData::from_static(include_bytes!(
+                "../fonts/FreeMono.ttf"
+            )),
+        );
+    
+        // Put my font first (highest priority) for proportional text:
+        fonts
+            .families
+            .entry(egui::FontFamily::Proportional)
+            .or_default()
+            .insert(0, "FreeMono".to_owned());
+    
+        // Put my font as last fallback for monospace:
+        fonts
+            .families
+            .entry(egui::FontFamily::Monospace)
+            .or_default()
+            .push("FreeMono".to_owned());
+    
+        // Tell egui to use these fonts:
+        ctx.set_fonts(fonts);
+    }
 
     pub struct GuiState {
         pub adc_state: AdcDataMessage,
@@ -42,8 +70,10 @@ pub mod gui {
 
     impl GuiApp {
 
-        pub const fn from(state: Arc<Mutex<GuiState>>, gui_tx_ap: Sender<BusMessage>) -> Self {
-
+        pub fn new(cc: &eframe::CreationContext<'_>, state: Arc<Mutex<GuiState>>, gui_tx_ap: Sender<BusMessage>) -> Self {
+            
+            setup_custom_fonts(&cc.egui_ctx);
+            
             Self { 
                 state: state, 
                 gui_tx_ap: gui_tx_ap, 
@@ -51,6 +81,7 @@ pub mod gui {
                 pfd: PrimaryFligthDisplay {}
             }
         }
+
     }
 
     impl APBusMessageSender for GuiApp {

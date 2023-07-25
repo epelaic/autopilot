@@ -3,7 +3,9 @@
 use std::sync::{MutexGuard, Arc};
 
 use egui::{Align2, Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding, FontId,
-    epaint::RectShape, epaint::Rect, epaint::TextShape, epaint::text::Fonts, epaint::text::FontFamily, epaint::text::FontDefinitions, FontData};
+    epaint::RectShape, epaint::Rect, epaint::TextShape, epaint::text::Fonts, epaint::text::FontFamily, epaint::text::FontDefinitions, FontData, text::LayoutJob, Galley};
+use eframe::emath::align::Align;
+
 use crate::gui::gui::GuiState;
 
 pub struct AttitudeIndicator { 
@@ -54,8 +56,6 @@ impl AttitudeIndicator {
     }
 
     pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
-        
-        //self.load_fonts(ctx);
 
         let roll_angle: f32 = state.adc_state.roll_angle;
         let pitch_angle: f32 = state.adc_state.pitch_angle;
@@ -114,8 +114,8 @@ impl AttitudeIndicator {
                 max: Pos2{x: self.x_middle_pos +5.0, y: self.y_middle_pos +5.0}
             }, 
             rounding: Rounding::none(), 
-            fill: Color32::BLACK, 
-            stroke: Stroke { width: 1.0, color: Color32::WHITE } 
+            fill: Color32::TRANSPARENT, 
+            stroke: Stroke { width: 2.0, color: Color32::WHITE } 
         };
 
         ui.painter().add(Shape::Rect(wing_left_rect));  
@@ -178,82 +178,46 @@ impl AttitudeIndicator {
         
             cliped_painter.add(agl_attitude_line_shape);
 
-            // if draw_angle_label {
+            if draw_angle_label {
 
-            //     let text_label = agl.to_string();
-            //     let x_anchor_pos: f32 = self.x_middle_pos - min_x;
-            //     let anchor: Align2  = Align2::RIGHT_CENTER;
+                let text_label = agl.to_string();
+                let y_anchor_pos: f32 = agl_pitch_line_y_pos - 5.0;
 
-            //     self.draw_attitude_ref_angle_label(&cliped_painter, ctx, text_label, agl_pitch_line_y_pos, x_anchor_pos, anchor);
-            // }
+                // Draw left
+                let left_x_anchor_pos: f32 = self.x_middle_pos - min_x - 20.0;
+                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, left_x_anchor_pos, Align::RIGHT);
+
+                // Draw right
+                let right_x_anchor_pos: f32 = self.x_middle_pos + max_x + 30.0;
+                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, right_x_anchor_pos, Align::RIGHT);
+            }
         }
     }
 
-    // fn draw_attitude_ref_angle_label(&self, cliped_painter: &Painter, ctx: &egui::Context, text_label: String, agl_pitch_line_y_pos: f32, x_anchor_pos: f32, anchor: Align2) {
+    fn draw_attitude_ref_angle_label(&self, ui: &mut Ui, cliped_painter: &Painter, ctx: &egui::Context, text_label: String, agl_pitch_line_y_pos: f32, x_anchor_pos: f32, anchor: Align) {
 
-    //     let fonts_defs: Box<FontDefinitions> = self.load_fonts(ctx);
-    //     let fd: FontDefinitions = *fonts_defs; 
-
-    //     for f in fd.families.iter() {
-    //         println!("Font ctx a : {:?}", f);
-    //     }
-
-    //     let fonts: Fonts = Fonts::new(ctx.pixels_per_point(), 1024, fd);
-
-
-    //     for f in fonts.families().iter() {
-    //         println!("Font ctx b: {:?}", f);
-    //     }
-
-    //     fonts.begin_frame(ctx.pixels_per_point(), 1024);
-
-    //     cliped_painter.add(Shape::text(
-    //         &fonts, 
-    //         Pos2{x: x_anchor_pos, y: agl_pitch_line_y_pos}, 
-    //         anchor, 
-    //         text_label, 
-    //         FontId::new(30.0, FontFamily::Name("FreeMono".into())), 
-    //         Color32::WHITE));
-
-    //     fonts.font_image_delta();
         
-    // }
+        let font_id: FontId = FontId::new(10.0, FontFamily::Monospace);
+        let mut layout_job: LayoutJob = LayoutJob::simple_singleline(text_label, font_id, Color32::WHITE);
+        layout_job.halign = anchor;
+
+        let galley = ctx.fonts(|f| {
+
+            f.layout_job(layout_job)
+        });
+        
+        let pos: Pos2 = Pos2{x: x_anchor_pos, y: agl_pitch_line_y_pos};
+        
+        let text_shape: TextShape = TextShape { pos, galley, underline: Stroke::NONE, override_text_color: None, angle: 0.0 };
+        
+        cliped_painter.add(text_shape);
+        
+        
+    }
 
     fn get_middle_pos(position_min: f32, width_or_height:f32) -> f32 {
 
         return position_min + (width_or_height / 2.0);
     }
-
-    // fn load_fonts(&self, ctx: &egui::Context) -> Box<FontDefinitions> {
-
-    //     // Install my own font:
-    //     println!("Installing custom fonts");
-        
-    //     let mut fonts_def = FontDefinitions::default();
-
-    //     for f in fonts_def.families.iter() {
-    //         println!("Font ctx 1 : {:?}", f);
-    //     }
-
-    //     fonts_def.font_data.insert("FreeMono".to_owned(), FontData::from_static(include_bytes!("../../fonts/FreeMono.ttf")));
-    //     fonts_def.families.insert(egui::FontFamily::Name("FreeMono".into()), vec!["FreeMono".to_owned()]);
-
-    //     // Put my font first (highest priority):
-    //     fonts_def.families.get_mut(&FontFamily::Proportional).unwrap()
-    //         .insert(0, "FreeMono".to_owned());
-        
-    //     // Put my font as last fallback for monospace:
-    //     fonts_def.families.get_mut(&FontFamily::Monospace).unwrap()
-    //         .insert(0, "FreeMono".to_owned());
-
-    //     for f in fonts_def.families.iter() {
-    //         println!("Font ctx 2 : {:?}", f);
-    //     }
-
-    //     //ctx.set_fonts(fonts_def.clone());
-
-    //     return Box::new(fonts_def);
-
-    // }
 
 }

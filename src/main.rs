@@ -75,7 +75,7 @@ fn main() {
     let gui_state: Arc<Mutex<GuiState>> = Arc::new(gui_state_mutex);
     let gui_state2: Arc<Mutex<GuiState>>  = gui_state.clone();
     
-    let gui_app: GuiApp = GuiApp::from(gui_state, gui_tx_ap);
+ //   let gui_app: GuiApp = GuiApp::from(gui_state, gui_tx_ap);
 
     let mut gui: Gui = Gui{
         state: gui_state2,
@@ -122,10 +122,10 @@ fn main() {
 
     // Init Gui APP
     let options = eframe::NativeOptions::default();
-    eframe::run_native(
+    let _ = eframe::run_native(
         "Autopilot",
         options,
-        Box::new(|_cc| Box::new(gui_app)),
+        Box::new(|cc| Box::new(GuiApp::new(cc, gui_state, gui_tx_ap))),
     );
 
     // join the handles in the vector
