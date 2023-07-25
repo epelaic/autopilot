@@ -4,7 +4,7 @@ use std::sync::{MutexGuard, Arc};
 
 use egui::{Align2, Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding, FontId,
     epaint::RectShape, epaint::Rect, epaint::TextShape, epaint::text::Fonts, epaint::text::FontFamily, epaint::text::FontDefinitions, FontData, text::LayoutJob, Galley};
-use eframe::emath::align::Align;
+use eframe::{emath::align::Align, epaint::PathShape};
 
 use crate::gui::gui::GuiState;
 
@@ -136,17 +136,21 @@ impl AttitudeIndicator {
         let rotation_axis: Pos2 = Pos2 { x: self.x_middle_pos, y: self.y_middle_pos };
 
         // Draw ground attitude
-        let ground_rect: RectShape = RectShape { 
-            rect: Rect{
-                min: Pos2{x: self.box_min_x - 100.0, y: pitch_line_y_pos }, 
-                max: Pos2{x: self.box_max_x + 100.0, y: pitch_line_y_pos + self.height + 50.0}
-            }, 
-            rounding: Rounding::none(), 
-            fill: Color32::BROWN, 
-            stroke: Stroke { width: 1.0, color: Color32::WHITE } 
-        };
+        // let ground_rect: RectShape = RectShape { 
+        //     rect: Rect{
+        //         min: Pos2{x: self.box_min_x - 100.0, y: pitch_line_y_pos }, 
+        //         max: Pos2{x: self.box_max_x + 100.0, y: pitch_line_y_pos + self.height + 50.0}
+        //     }, 
+        //     rounding: Rounding::none(), 
+        //     fill: Color32::BROWN, 
+        //     stroke: Stroke { width: 1.0, color: Color32::WHITE } 
+        // };
+        let ground_rect_vec: Vec<Pos2> = AttitudeIndicator::build_path_shape_rect(self.x_middle_pos - 250.0, pitch_line_y_pos, 500.0, self.height + 150.0 );
+        let ground_rect_vec_mut: &mut Vec<Pos2> = &mut ground_rect_vec.to_owned();
+        AttitudeIndicator::rotate_vec_pos2(rotation_axis, roll_angle_in_radians, ground_rect_vec_mut);
+        let ground_rect: PathShape = PathShape{points: ground_rect_vec_mut.to_vec(), closed: true, fill: Color32::BROWN, stroke: Stroke::NONE };
 
-        cliped_painter.add(Shape::Rect(ground_rect));
+        cliped_painter.add(ground_rect);
 
         // Draw horizon line attitude
         let attitude_line_pos: &mut [Pos2; 2] = &mut [Pos2{x: self.box_min_x, y: pitch_line_y_pos}, Pos2{x: self.box_max_x, y: pitch_line_y_pos}];
@@ -266,6 +270,27 @@ impl AttitudeIndicator {
         //println!("xc : {}, yc : {}", xc, yc);
 
         (xc, yc)
+    }
+
+    fn build_path_shape_rect(x: f32, y: f32, width: f32, height: f32) -> Vec<Pos2> {
+
+        let mut result: Vec<Pos2> = Vec::new();
+        result.push(Pos2{x: x, y: y});
+        result.push(Pos2{x: x + width, y: y});
+        result.push(Pos2{x: x + width, y: y + height});
+        result.push(Pos2{x: x, y: y + height});
+
+        result
+    }
+
+    fn rotate_vec_pos2(rotation_axis: Pos2, roll_angle_in_radians: f32, vec: &mut Vec<Pos2>) {
+
+        for p in vec.iter_mut() {
+
+            let (x1, y1) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, *p);
+            p.x = x1;
+            p.y = y1;
+        }
     }
 
 }
