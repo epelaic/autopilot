@@ -11,3 +11,4 @@ egui = { version = "0.22.0", features = ["default_fonts"] }
 eframe = "0.22.0"
 num-traits = "0.2"
 num-derive = "0.2"
+rust_math = "0.3.7"

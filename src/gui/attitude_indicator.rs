@@ -126,11 +126,14 @@ impl AttitudeIndicator {
 
     fn draw_aircraft_attitude(&self, ui: &mut Ui, ctx: &egui::Context, roll_angle: f32, pitch_angle: f32, cliped_painter: Painter) {
 
+        let roll_angle_in_radians: f32 = rust_math::trigonometry::deg2rad(roll_angle) * -1.0;
         let view_visible_angles: f32 = 60.0;
 
         // Calc y offet pitch
         let pitch_line_y_offset: f32 = pitch_angle * self.height / view_visible_angles;
         let pitch_line_y_pos: f32 = pitch_line_y_offset + self.y_middle_pos;
+
+        let rotation_axis: Pos2 = Pos2 { x: self.x_middle_pos, y: pitch_line_y_pos };
 
         // Draw ground attitude
         let ground_rect: RectShape = RectShape { 
@@ -146,8 +149,15 @@ impl AttitudeIndicator {
         cliped_painter.add(Shape::Rect(ground_rect));
 
         // Draw horizon line attitude
-        let attitude_line_pos: [Pos2; 2] = [Pos2{x: self.box_min_x, y: pitch_line_y_pos}, Pos2{x: self.box_max_x, y: pitch_line_y_pos}];
-        let attitude_line_shape: Shape = Shape::line_segment(attitude_line_pos, Stroke { width: 1.0, color: Color32::WHITE } );
+        let attitude_line_pos: &mut [Pos2; 2] = &mut [Pos2{x: self.box_min_x, y: pitch_line_y_pos}, Pos2{x: self.box_max_x, y: pitch_line_y_pos}];
+        
+        //println!("before rotate : {:?}", attitude_line_pos);
+        
+        AttitudeIndicator::rotate_line(rotation_axis, roll_angle_in_radians, attitude_line_pos);
+        
+        //println!("after rotate : {:?}", attitude_line_pos);
+        
+        let attitude_line_shape: Shape = Shape::line_segment(*attitude_line_pos, Stroke { width: 1.0, color: Color32::WHITE } );
     
         cliped_painter.add(attitude_line_shape);
 
@@ -173,8 +183,11 @@ impl AttitudeIndicator {
                 draw_angle_label = false;
             }
 
-            let agl_attitude_line_pos: [Pos2; 2] = [Pos2{x: self.x_middle_pos - min_x, y: agl_pitch_line_y_pos}, Pos2{x: self.x_middle_pos + max_x, y: agl_pitch_line_y_pos}];
-            let agl_attitude_line_shape: Shape = Shape::line_segment(agl_attitude_line_pos, Stroke { width: 1.0, color: Color32::WHITE } );
+            let agl_attitude_line_pos: &mut [Pos2; 2] = &mut [Pos2{x: self.x_middle_pos - min_x, y: agl_pitch_line_y_pos}, Pos2{x: self.x_middle_pos + max_x, y: agl_pitch_line_y_pos}];
+            
+            AttitudeIndicator::rotate_line(rotation_axis, roll_angle_in_radians, agl_attitude_line_pos);
+            
+            let agl_attitude_line_shape: Shape = Shape::line_segment(*agl_attitude_line_pos, Stroke { width: 1.0, color: Color32::WHITE } );
         
             cliped_painter.add(agl_attitude_line_shape);
 
@@ -185,16 +198,23 @@ impl AttitudeIndicator {
 
                 // Draw left
                 let left_x_anchor_pos: f32 = self.x_middle_pos - min_x - 20.0;
-                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, left_x_anchor_pos, Align::RIGHT);
+                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, left_x_anchor_pos, Align::RIGHT, roll_angle_in_radians, rotation_axis);
 
                 // Draw right
                 let right_x_anchor_pos: f32 = self.x_middle_pos + max_x + 30.0;
-                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, right_x_anchor_pos, Align::RIGHT);
+                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, right_x_anchor_pos, Align::RIGHT, roll_angle_in_radians, rotation_axis);
             }
         }
+
+         // Draw axis rotation circle ref (debug purposes)
+        cliped_painter.add(Shape::circle_filled(rotation_axis, 10.0, Color32::GREEN));
+
     }
 
-    fn draw_attitude_ref_angle_label(&self, ui: &mut Ui, cliped_painter: &Painter, ctx: &egui::Context, text_label: String, agl_pitch_line_y_pos: f32, x_anchor_pos: f32, anchor: Align) {
+    fn draw_attitude_ref_angle_label(
+        &self, ui: &mut Ui, cliped_painter: &Painter, ctx: &egui::Context, 
+        text_label: String, agl_pitch_line_y_pos: f32, x_anchor_pos: f32, 
+        anchor: Align, roll_angle_in_radians: f32, rotation_axis: Pos2) {
 
         
         let font_id: FontId = FontId::new(10.0, FontFamily::Monospace);
@@ -206,9 +226,12 @@ impl AttitudeIndicator {
             f.layout_job(layout_job)
         });
         
-        let pos: Pos2 = Pos2{x: x_anchor_pos, y: agl_pitch_line_y_pos};
-        
-        let text_shape: TextShape = TextShape { pos, galley, underline: Stroke::NONE, override_text_color: None, angle: 0.0 };
+        let mut pos: Pos2 = Pos2{x: x_anchor_pos, y: agl_pitch_line_y_pos};
+
+        let (xc1, yc1) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, pos);
+        pos = Pos2{x: xc1, y: yc1};
+
+        let text_shape: TextShape = TextShape { pos, galley, underline: Stroke::NONE, override_text_color: None, angle: roll_angle_in_radians * -1.0 };
         
         cliped_painter.add(text_shape);
         
@@ -218,6 +241,31 @@ impl AttitudeIndicator {
     fn get_middle_pos(position_min: f32, width_or_height:f32) -> f32 {
 
         return position_min + (width_or_height / 2.0);
+    }
+
+    fn rotate_line(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: &mut[Pos2; 2]) {
+
+
+        let (xc1, yc1) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[0]);
+
+        let (xc2, yc2) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[1]);
+
+        *pos = [Pos2{x: xc1, y: yc1}, Pos2{x: xc2, y: yc2}];
+    }
+
+    fn rotate_pos2(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: Pos2) -> (f32, f32){
+
+        let xo: f32 = rotation_axis.x;
+        let yo: f32 = rotation_axis.y;
+        
+        let x_m: f32 = pos.x - xo;
+        let y_m: f32 = pos.y - yo;
+
+        let xc: f32 = x_m * roll_angle_in_radians.cos() + y_m * roll_angle_in_radians.sin() + xo;
+        let yc: f32 = - x_m * roll_angle_in_radians.sin() + y_m * roll_angle_in_radians.cos() + yo;
+        //println!("xc : {}, yc : {}", xc, yc);
+
+        (xc, yc)
     }
 
 }

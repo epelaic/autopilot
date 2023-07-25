@@ -58,7 +58,7 @@ impl SensorsProvider for SimMockSensorsProvider {
             0.5f32,
             1.0f32,
             5f32,
-            0f32,
+            30f32,
             0f32);
         
         Ok(result)
