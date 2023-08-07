@@ -21,6 +21,14 @@ pub struct SpeedIndicator {
 }
 
 impl SpeedIndicator {
+
+    const VISIBLE_IAS_LABEL_SCALE: [f32; 51] = [
+        0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0,
+        100.0, 110.0, 120.0, 130.0, 140.0, 150.0, 160.0, 170.0, 180.0, 190.0, 
+        200.0, 210.0, 220.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0, 290.0, 
+        300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0, 380.0, 390.0,
+        400.0, 410.0, 420.0, 430.0, 440.0, 450.0, 460.0, 470.0, 480.0, 490.0,
+        500.0];
     
     pub fn new(position: Pos2, width: f32, height: f32) -> SpeedIndicator {
 
@@ -67,10 +75,56 @@ impl SpeedIndicator {
 
         let ias: f32 = state.adc_state.ias;
 
-        self.draw_ias_speed(ias, ctx, cliped_painter);
+        self.draw_ias_scale(ias, ctx, &cliped_painter);
+        self.draw_ias_speed(ias, ctx, &cliped_painter);
     }
 
-    fn draw_ias_speed(&self, ias: f32, ctx: &egui::Context, cliped_painter: Painter) {
+    fn draw_ias_scale(&self, ias: f32, ctx: &egui::Context, cliped_painter: &Painter) {
+
+        const TOTAL_SPEED_VISIBLE: f32 = 120.0;
+        let max_visible_speed: f32 = ias + 60.0;
+        let mut min_visible_speed: f32 = ias - 60.0;
+
+
+        if min_visible_speed < 0.0 {
+            min_visible_speed = 0.0;
+        }
+
+        let visible_ias_scale: Vec<f32> = SpeedIndicator::VISIBLE_IAS_LABEL_SCALE.iter()
+                    .filter(|v| v >= &&min_visible_speed && v <= &&max_visible_speed)
+                    .map(|v| *v)
+                    .collect();
+        
+        let font_size: f32 = 15.0;
+
+        for v_scale in visible_ias_scale {
+
+            let text_label: String = v_scale.to_string();
+            let v_scale_offset_from_ias: f32 = ias - v_scale;
+            let v_scale_y_offset_from_ias: f32 = (v_scale_offset_from_ias * self.height) / TOTAL_SPEED_VISIBLE;
+            let v_scale_y_pos: f32 = v_scale_y_offset_from_ias + self.y_middle_pos;
+
+            // Speed scale label
+            if (v_scale as i32 / 10) % 2 == 0 {
+            
+                let pos: Pos2 = Pos2 { x: self.x_middle_pos + 2.5, y: v_scale_y_pos - font_size/2.0 };
+                gui_utils::draw_text_label(&cliped_painter, ctx, text_label, 
+                                    font_size, Color32::WHITE, Stroke::NONE, 
+                                    pos, Align::RIGHT, None);
+            }
+
+            // Speed scale line
+            let v_scale_line_pos: [Pos2; 2] = [
+                Pos2{x: self.x_middle_pos + 5.0, y: v_scale_y_pos},
+                Pos2{x: self.x_middle_pos + 15.0, y:v_scale_y_pos}
+            ];
+
+            cliped_painter.add(Shape::LineSegment { points: v_scale_line_pos, stroke: Stroke { width: 1.5, color: Color32::WHITE } });
+        }
+
+    }
+
+    fn draw_ias_speed(&self, ias: f32, ctx: &egui::Context, cliped_painter: &Painter) {
 
         // IAS Rect background
         let ias_bg_path_points: Vec<Pos2> = vec![
