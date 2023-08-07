@@ -35,20 +35,6 @@ pub mod providers {
         }
     }
 
-    enum FligthCtrlsProviderEnum {
-        XPLN11,
-        SIMMOCK,
-    }
-
-    impl fmt::Display for FligthCtrlsProviderEnum {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            match self {
-                FligthCtrlsProviderEnum::XPLN11 => write!(f, "xpln11"),
-                FligthCtrlsProviderEnum::SIMMOCK => write!(f, "simmock"),
-            }
-        }
-    }
-
     pub fn resolve_provider(config: &Yaml) -> Box<dyn Provider> {
 
         println!("Resolving provider");
