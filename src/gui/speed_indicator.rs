@@ -141,9 +141,10 @@ impl SpeedIndicator {
         cliped_painter.add(ias_bg_path);
 
         // IAS Text
+        let text_label: String = (ias as i32).to_string();
         let font_size: f32 = 20.0;
         let pos: Pos2 = Pos2 { x: self.x_middle_pos + 2.5, y: self.y_middle_pos - font_size/2.0 };
-        gui_utils::draw_text_label(&cliped_painter, ctx, ias.to_string(), 
+        gui_utils::draw_text_label(&cliped_painter, ctx, text_label, 
                                     font_size, Color32::WHITE, Stroke::NONE, 
                                     pos, Align::RIGHT, None);
 
