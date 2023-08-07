@@ -3,14 +3,18 @@ mod ap_panel;
 mod attitude_indicator;
 mod common;
 mod constants;
+mod gui_utils;
 mod pfd;
+mod speed_indicator;
 
 extern crate egui;
 
 
 pub mod gui {
 
-    use std::{sync::{mpsc::{Sender, Receiver, TryRecvError}, Arc, Mutex, MutexGuard}, time::Duration, thread, io::Empty};
+    use std::sync::{mpsc::{Sender, Receiver, TryRecvError}, Arc, Mutex, MutexGuard};
+
+    use egui::Pos2;
 
     use crate::bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage};
     use crate::gui::common::APBusMessageSender;
@@ -78,7 +82,10 @@ pub mod gui {
                 state: state, 
                 gui_tx_ap: gui_tx_ap, 
                 ap_panel: AutopilotPanel{}, 
-                pfd: PrimaryFligthDisplay {}
+                pfd: PrimaryFligthDisplay::new(
+                    Pos2{x: 250.0, y: 15.0},
+                    500.0,
+                    500.0)
             }
         }
 
@@ -120,7 +127,7 @@ pub mod gui {
 
         pub fn handle_bus_message(&mut self) {
 
-            let d: Duration = Duration::from_millis(50);
+            //let d: std::time::Duration = std::time::Duration::from_millis(50);
 
             match self.rx_gui.try_recv() {
                 Ok(bus_message) => {
@@ -138,7 +145,7 @@ pub mod gui {
                 }
             }
 
-            //thread::sleep(d);
+            //std::thread::sleep(d);
         }
 
         fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {

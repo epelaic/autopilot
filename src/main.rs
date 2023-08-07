@@ -15,12 +15,13 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::thread::{self};
 use std::fs;
 use std::time::Duration;
+use egui::Vec2;
 use gui::gui::GuiState;
 use yaml_rust::{YamlLoader, Yaml};
 
-use crate::avionics::adc::adc::{Adc};
+use crate::avionics::adc::adc::Adc;
 use crate::avionics::autopilot::autopilot::Autopilot;
-use crate::bus::{BusMessage};
+use crate::bus::BusMessage;
 use crate::sensors::SensorsProvider; 
 use crate::flight_ctrl::flight_ctrls::FlightCtrlsProvider; 
 use crate::providers::providers::Provider;
@@ -121,10 +122,12 @@ fn main() {
     println!("Autopilot ready");
 
     // Init Gui APP
-    let options = eframe::NativeOptions::default();
+    let options = &mut eframe::NativeOptions::default();
+    options.initial_window_size = Some(Vec2{x: 800.0, y: 700.0});
+
     let _ = eframe::run_native(
         "Autopilot",
-        options,
+        options.to_owned(),
         Box::new(|cc| Box::new(GuiApp::new(cc, gui_state, gui_tx_ap))),
     );
 

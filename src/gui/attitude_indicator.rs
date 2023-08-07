@@ -1,12 +1,13 @@
 
 
-use std::sync::{MutexGuard, Arc};
+use std::sync::MutexGuard;
 
-use egui::{Align2, Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding, FontId,
-    epaint::RectShape, epaint::Rect, epaint::TextShape, epaint::text::Fonts, epaint::text::FontFamily, epaint::{text::FontDefinitions, CubicBezierShape}, FontData, text::LayoutJob, Galley};
+use egui::{Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding,
+    epaint::RectShape, epaint::Rect};
 use eframe::{emath::align::Align, epaint::PathShape};
 
 use crate::gui::gui::GuiState;
+use crate::gui::gui_utils;
 
 pub struct AttitudeIndicator { 
 
@@ -39,8 +40,8 @@ impl AttitudeIndicator {
         let box_max_x: f32 = position.x + width;
         let box_min_y: f32 = position.y;
         let box_max_y: f32 = position.y + height;
-        let x_middle_pos: f32 = AttitudeIndicator::get_middle_pos(box_min_x, width);
-        let y_middle_pos: f32 = AttitudeIndicator::get_middle_pos(box_min_y, height);
+        let x_middle_pos: f32 = gui_utils::get_middle_pos(box_min_x, width);
+        let y_middle_pos: f32 = gui_utils::get_middle_pos(box_min_y, height);
 
         AttitudeIndicator{
             position,
@@ -193,11 +194,11 @@ impl AttitudeIndicator {
 
                 // Draw left
                 let left_x_anchor_pos: f32 = self.x_middle_pos - min_x - 20.0;
-                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, left_x_anchor_pos, Align::RIGHT, roll_angle_in_radians, rotation_axis);
+                self.draw_attitude_ref_angle_label(&cliped_painter, ctx, text_label.clone(), y_anchor_pos, left_x_anchor_pos, Align::RIGHT, roll_angle_in_radians, rotation_axis);
 
                 // Draw right
                 let right_x_anchor_pos: f32 = self.x_middle_pos + max_x + 30.0;
-                self.draw_attitude_ref_angle_label(ui,&cliped_painter, ctx, text_label.clone(), y_anchor_pos, right_x_anchor_pos, Align::RIGHT, roll_angle_in_radians, rotation_axis);
+                self.draw_attitude_ref_angle_label(&cliped_painter, ctx, text_label.clone(), y_anchor_pos, right_x_anchor_pos, Align::RIGHT, roll_angle_in_radians, rotation_axis);
             }
         }
 
@@ -209,30 +210,18 @@ impl AttitudeIndicator {
     }
 
     fn draw_attitude_ref_angle_label(
-        &self, ui: &mut Ui, cliped_painter: &Painter, ctx: &egui::Context, 
+        &self, cliped_painter: &Painter, ctx: &egui::Context, 
         text_label: String, agl_pitch_line_y_pos: f32, x_anchor_pos: f32, 
         anchor: Align, roll_angle_in_radians: f32, rotation_axis: Pos2) {
-
-        
-        let font_id: FontId = FontId::new(10.0, FontFamily::Monospace);
-        let mut layout_job: LayoutJob = LayoutJob::simple_singleline(text_label, font_id, Color32::WHITE);
-        layout_job.halign = anchor;
-
-        let galley = ctx.fonts(|f| {
-
-            f.layout_job(layout_job)
-        });
         
         let mut pos: Pos2 = Pos2{x: x_anchor_pos, y: agl_pitch_line_y_pos};
 
-        let (xc1, yc1) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, pos);
+        let (xc1, yc1) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, pos);
         pos = Pos2{x: xc1, y: yc1};
-
-        let text_shape: TextShape = TextShape { pos, galley, underline: Stroke::NONE, override_text_color: None, angle: roll_angle_in_radians * -1.0 };
         
-        cliped_painter.add(text_shape);
-        
-        
+        gui_utils::draw_text_label(&cliped_painter, ctx, text_label, 
+                                    10.0, Color32::WHITE, Stroke::NONE, 
+                                    pos, anchor, Some(roll_angle_in_radians));
     }
 
     fn draw_bank_angle_ref(&self, ui: &mut Ui, rotation_axis: Pos2, roll_angle_in_radians: f32) {
@@ -247,7 +236,7 @@ impl AttitudeIndicator {
         for a in agl_p.iter() {
             let base_p: &mut Pos2 = &mut base_point.to_owned();
             let angle_in_radians: f32 = rust_math::trigonometry::deg2rad(*a);
-            let r: (f32, f32) = AttitudeIndicator::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
+            let r: (f32, f32) = gui_utils::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
             bgr.push(Pos2{x: r.0, y: r.1});
         }
 
@@ -265,7 +254,7 @@ impl AttitudeIndicator {
         for a in agl_n.iter() {
             let base_p: &mut Pos2 = &mut base_point.to_owned();
             let angle_in_radians: f32 = rust_math::trigonometry::deg2rad(*a);
-            let r: (f32, f32) = AttitudeIndicator::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
+            let r: (f32, f32) = gui_utils::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
             bgr.push(Pos2{x: r.0, y: r.1});
         }
 
@@ -315,34 +304,14 @@ impl AttitudeIndicator {
         ui.painter().add(Shape::line(points.to_vec(), Stroke { width: 2.0, color: Color32::WHITE }));
     }
 
-    fn get_middle_pos(position_min: f32, width_or_height:f32) -> f32 {
-
-        return position_min + (width_or_height / 2.0);
-    }
-
     fn rotate_line(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: &mut[Pos2; 2]) {
 
 
-        let (xc1, yc1) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[0]);
+        let (xc1, yc1) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[0]);
 
-        let (xc2, yc2) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[1]);
+        let (xc2, yc2) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[1]);
 
         *pos = [Pos2{x: xc1, y: yc1}, Pos2{x: xc2, y: yc2}];
-    }
-
-    fn rotate_pos2(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: Pos2) -> (f32, f32){
-
-        let xo: f32 = rotation_axis.x;
-        let yo: f32 = rotation_axis.y;
-        
-        let x_m: f32 = pos.x - xo;
-        let y_m: f32 = pos.y - yo;
-
-        let xc: f32 = x_m * roll_angle_in_radians.cos() + y_m * roll_angle_in_radians.sin() + xo;
-        let yc: f32 = - x_m * roll_angle_in_radians.sin() + y_m * roll_angle_in_radians.cos() + yo;
-        //println!("xc : {}, yc : {}", xc, yc);
-
-        (xc, yc)
     }
 
     fn build_path_shape_rect(x: f32, y: f32, width: f32, height: f32) -> Vec<Pos2> {
@@ -360,7 +329,7 @@ impl AttitudeIndicator {
 
         for p in vec.iter_mut() {
 
-            let (x1, y1) = AttitudeIndicator::rotate_pos2(rotation_axis, roll_angle_in_radians, *p);
+            let (x1, y1) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, *p);
             p.x = x1;
             p.y = y1;
         }
