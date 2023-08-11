@@ -16,7 +16,7 @@ use egui::{Ui, Pos2, epaint::RectShape, Painter, Rect, Rounding, Color32, Stroke
 use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
 
-use super::{speed_indicator::SpeedIndicator, gui_utils};
+use super::{speed_indicator::SpeedIndicator, gui_utils, altitude_indicator::{self, AltitudeIndicator}};
 
 pub struct PrimaryFligthDisplay { 
 
@@ -108,8 +108,14 @@ impl PrimaryFligthDisplay {
                 300.0,
                 300.0);
 
+            let altitude_indicator: AltitudeIndicator = AltitudeIndicator::new(
+                Pos2{x: self.box_max_x - 100.0, y: self.box_min_y + 60.0},
+                75.0,
+                400.0);
+
             speed_indicator.view_update(state, ctx, ui);
             attitude_indicator.view_update(state, ctx, ui);
+            altitude_indicator.view_update(state, ctx, ui);
         });
     }
 }

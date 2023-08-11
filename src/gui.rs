@@ -1,5 +1,6 @@
 
 mod ap_panel;
+mod altitude_indicator;
 mod attitude_indicator;
 mod common;
 mod constants;
