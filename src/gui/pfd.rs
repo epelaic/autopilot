@@ -1,11 +1,12 @@
 /**
  * PFD for Primary Flight Display
  * Display graphically : 
- * - speed (IAS in knots)
- * - Altitude (Feets)
+ * - Speed (IAS in knots)
+ * - Altitude (feets)
  * - Bank angle (deg)
  * - Pitch angle (deg)
  * - Vertical speed (feets/min)
+ * - Heading (deg)
  */
 
 
@@ -16,7 +17,12 @@ use egui::{Ui, Pos2, epaint::RectShape, Painter, Rect, Rounding, Color32, Stroke
 use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
 
-use super::{speed_indicator::SpeedIndicator, gui_utils, altitude_indicator::{self, AltitudeIndicator}};
+use super::{
+    gui_utils,
+    speed_indicator::SpeedIndicator, 
+    altitude_indicator::AltitudeIndicator,
+    heading_indicator::HeadingIndicator
+};
 
 pub struct PrimaryFligthDisplay { 
 
@@ -112,10 +118,16 @@ impl PrimaryFligthDisplay {
                 Pos2{x: self.box_max_x - 100.0, y: self.box_min_y + 60.0},
                 75.0,
                 400.0);
+            
+            let heading_indicator: HeadingIndicator = HeadingIndicator::new(
+                Pos2{x: self.box_min_x + 95.0, y: self.box_min_y + 500.0},
+                300.0,
+                100.0);
 
             speed_indicator.view_update(state, ctx, ui);
             attitude_indicator.view_update(state, ctx, ui);
             altitude_indicator.view_update(state, ctx, ui);
+            heading_indicator.view_update(state, ctx, ui);
         });
     }
 }

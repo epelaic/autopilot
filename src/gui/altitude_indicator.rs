@@ -1,4 +1,3 @@
-use std::ops::Range;
 use std::sync::MutexGuard;
 
 use egui::epaint::{RectShape, PathShape};

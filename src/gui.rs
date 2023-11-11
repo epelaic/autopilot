@@ -4,6 +4,7 @@ mod altitude_indicator;
 mod attitude_indicator;
 mod common;
 mod constants;
+mod heading_indicator;
 mod gui_utils;
 mod pfd;
 mod speed_indicator;
@@ -86,10 +87,9 @@ pub mod gui {
                 pfd: PrimaryFligthDisplay::new(
                     Pos2{x: 250.0, y: 15.0},
                     500.0,
-                    500.0)
+                    605.0)
             }
         }
-
     }
 
     impl APBusMessageSender for GuiApp {
