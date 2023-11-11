@@ -71,7 +71,7 @@ impl HeadingIndicator {
         trg.push(Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0});
 
         let trg_shape: PathShape = PathShape { points: trg, closed: true, fill: Color32::BLACK, stroke: Stroke { width: 2.0, color: Color32::WHITE }};
-        ui.painter().add(trg_shape);
+        cliped_painter.add(trg_shape);
 
         // Vertical white middle line
         let vertical_middle_line_pos: [Pos2; 2] = [
@@ -79,6 +79,6 @@ impl HeadingIndicator {
             Pos2{x: self.x_middle_pos, y: self.box_max_y}
         ];
         let vertical_middle_line_shape: Shape = Shape::line_segment(vertical_middle_line_pos, Stroke { width: 2.0, color: Color32::WHITE } );
-        ui.painter().add(vertical_middle_line_shape);
+        cliped_painter.add(vertical_middle_line_shape);
     }
 }
