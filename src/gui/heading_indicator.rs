@@ -1,6 +1,7 @@
 use std::sync::MutexGuard;
 
-use egui::{Pos2, Ui, Rect, Painter, epaint::{RectShape, PathShape, CircleShape}, Rounding, Color32, Stroke, Shape};
+use egui::{Pos2, Ui, Rect, Painter, epaint::RectShape, Rounding, Color32, Stroke, Shape, TextureId};
+use egui::epaint::PathShape;
 
 use super::{gui_utils, gui::GuiState};
 
@@ -44,7 +45,7 @@ impl HeadingIndicator {
         }
     }
 
-    pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
+    pub fn view_update(&self, _state: &mut MutexGuard<GuiState>, _ctx: &egui::Context, ui: &mut Ui) {
 
         // Primary rect (external boundaries)
         let clip_rect: Rect = Rect{
@@ -56,9 +57,11 @@ impl HeadingIndicator {
 
         let box_rect: RectShape = RectShape { 
             rect: clip_rect, 
-            rounding: Rounding::none(), 
+            rounding: Rounding::ZERO, 
             fill: Color32::BLACK, 
-            stroke: Stroke { width: 2.0, color: Color32::BLACK } 
+            stroke: Stroke { width: 2.0, color: Color32::BLACK },
+            fill_texture_id: TextureId::Managed(0),
+            uv: Rect::ZERO
         };
 
         // Call painter to draw objects

@@ -1,7 +1,7 @@
 use std::sync::MutexGuard;
 
 use egui::epaint::{RectShape, PathShape};
-use egui::{Pos2, Ui, Rect, Painter, Rounding, Color32, Stroke, Shape, Align};
+use egui::{Pos2, Ui, Rect, Painter, Rounding, Color32, Stroke, Shape, Align, TextureId};
 use crate::gui::gui::GuiState;
 use crate::gui::gui_utils;
 
@@ -57,9 +57,11 @@ impl AltitudeIndicator {
 
         let box_rect: RectShape = RectShape { 
             rect: clip_rect, 
-            rounding: Rounding::none(), 
+            rounding: Rounding::ZERO, 
             fill: Color32::GRAY, 
-            stroke: Stroke { width: 2.0, color: Color32::GRAY } 
+            stroke: Stroke { width: 2.0, color: Color32::GRAY },
+            fill_texture_id: TextureId::Managed(0),
+            uv: Rect::ZERO
         };
 
         // Call painter to draw objects

@@ -2,6 +2,7 @@
 
 use std::sync::MutexGuard;
 
+use egui::TextureId;
 use egui::{Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding,
     epaint::RectShape, epaint::Rect};
 use eframe::{emath::align::Align, epaint::PathShape};
@@ -71,9 +72,11 @@ impl AttitudeIndicator {
 
         let box_rect: RectShape = RectShape { 
             rect: clip_rect, 
-            rounding: Rounding::none(), 
+            rounding: Rounding::ZERO, 
             fill: Color32::BLUE, 
-            stroke: Stroke { width: 2.0, color: Color32::BROWN } 
+            stroke: Stroke { width: 2.0, color: Color32::BROWN },
+            fill_texture_id: TextureId::Managed(0),
+            uv: Rect::ZERO
         };
 
         // Call painter to draw objects
@@ -92,9 +95,11 @@ impl AttitudeIndicator {
                 min: Pos2{x: self.box_min_x + 20.0, y: self.y_middle_pos -5.0 }, 
                 max: Pos2{x: self.box_min_x + 100.0, y: self.y_middle_pos +5.0}
             }, 
-            rounding: Rounding::none(), 
+            rounding: Rounding::ZERO, 
             fill: Color32::BLACK, 
-            stroke: Stroke { width: 1.0, color: Color32::WHITE } 
+            stroke: Stroke { width: 1.0, color: Color32::WHITE },
+            fill_texture_id: TextureId::Managed(0),
+            uv: Rect::ZERO
         };
 
         // Static rigth wing (référence)
@@ -103,9 +108,11 @@ impl AttitudeIndicator {
                 min: Pos2{x: self.box_max_x - 100.0, y: self.y_middle_pos -5.0 }, 
                 max: Pos2{x: self.box_max_x - 20.0, y: self.y_middle_pos +5.0}
             }, 
-            rounding: Rounding::none(), 
+            rounding: Rounding::ZERO, 
             fill: Color32::BLACK, 
-            stroke: Stroke { width: 1.0, color: Color32::WHITE } 
+            stroke: Stroke { width: 1.0, color: Color32::WHITE },
+            fill_texture_id: TextureId::Managed(0),
+            uv: Rect::ZERO
         };  
 
         // Static centered mini rect
@@ -114,9 +121,11 @@ impl AttitudeIndicator {
                 min: Pos2{x: self.x_middle_pos -5.0, y: self.y_middle_pos -5.0 }, 
                 max: Pos2{x: self.x_middle_pos +5.0, y: self.y_middle_pos +5.0}
             }, 
-            rounding: Rounding::none(), 
+            rounding: Rounding::ZERO, 
             fill: Color32::TRANSPARENT, 
-            stroke: Stroke { width: 2.0, color: Color32::WHITE } 
+            stroke: Stroke { width: 2.0, color: Color32::WHITE },
+            fill_texture_id: TextureId::Managed(0),
+            uv: Rect::ZERO
         };
 
         ui.painter().add(Shape::Rect(wing_left_rect));  

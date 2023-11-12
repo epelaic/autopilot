@@ -12,7 +12,7 @@
 
 use std::sync::MutexGuard;
 
-use egui::{Ui, Pos2, epaint::RectShape, Painter, Rect, Rounding, Color32, Stroke, Shape};
+use egui::{Ui, Pos2, epaint::RectShape, Painter, Rect, Rounding, Color32, Stroke, Shape, TextureId};
 
 use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
@@ -96,9 +96,11 @@ impl PrimaryFligthDisplay {
 
             let box_rect: RectShape = RectShape { 
                 rect: clip_rect, 
-                rounding: Rounding::none(), 
+                rounding: Rounding::ZERO, 
                 fill: Color32::BLACK, 
-                stroke: Stroke { width: 2.0, color: Color32::BLACK } 
+                stroke: Stroke { width: 2.0, color: Color32::BLACK },
+                fill_texture_id: TextureId::Managed(0),
+                uv: Rect::ZERO
             };
 
             // Call painter to draw objects
