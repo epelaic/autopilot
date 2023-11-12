@@ -1,6 +1,6 @@
 use std::sync::MutexGuard;
 
-use egui::{Pos2, Ui, Rect, Painter, epaint::{RectShape, PathShape}, Rounding, Color32, Stroke, Shape};
+use egui::{Pos2, Ui, Rect, Painter, epaint::{RectShape, PathShape, CircleShape}, Rounding, Color32, Stroke, Shape};
 
 use super::{gui_utils, gui::GuiState};
 
@@ -57,12 +57,17 @@ impl HeadingIndicator {
         let box_rect: RectShape = RectShape { 
             rect: clip_rect, 
             rounding: Rounding::none(), 
-            fill: Color32::GRAY, 
-            stroke: Stroke { width: 2.0, color: Color32::GRAY } 
+            fill: Color32::BLACK, 
+            stroke: Stroke { width: 2.0, color: Color32::BLACK } 
         };
 
         // Call painter to draw objects
         ui.painter().add(Shape::Rect(box_rect));
+
+        // heading disc
+        let heading_disc_center_pos: Pos2 = Pos2{x: self.x_middle_pos, y: self.box_min_y + (self.width / 2.0) + 15.0};
+        let heading_disc_shape: Shape = Shape::circle_filled(heading_disc_center_pos, self.width / 2.0, Color32::GRAY);
+        cliped_painter.add(heading_disc_shape);
 
         // 0° reverse triangle reference
         let mut trg: Vec<Pos2> = Vec::new();
@@ -80,5 +85,6 @@ impl HeadingIndicator {
         ];
         let vertical_middle_line_shape: Shape = Shape::line_segment(vertical_middle_line_pos, Stroke { width: 2.0, color: Color32::WHITE } );
         cliped_painter.add(vertical_middle_line_shape);
+
     }
 }
