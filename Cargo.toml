@@ -10,5 +10,5 @@ yaml-rust = "0.4"
 egui = { version = "0.23.0", features = ["default_fonts"] }
 eframe = "0.23.0"
 num-traits = "0.2"
-num-derive = "0.2"
+num-derive = "0.4.1"
 rust_math = "0.3.7"
