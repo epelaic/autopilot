@@ -158,7 +158,7 @@ impl AttitudeIndicator {
         
         //println!("before rotate : {:?}", attitude_line_pos);
         
-        AttitudeIndicator::rotate_line(rotation_axis, roll_angle_in_radians, attitude_line_pos);
+        gui_utils::rotate_line(rotation_axis, roll_angle_in_radians, attitude_line_pos);
         
         //println!("after rotate : {:?}", attitude_line_pos);
         
@@ -190,7 +190,7 @@ impl AttitudeIndicator {
 
             let agl_attitude_line_pos: &mut [Pos2; 2] = &mut [Pos2{x: self.x_middle_pos - min_x, y: agl_pitch_line_y_pos}, Pos2{x: self.x_middle_pos + max_x, y: agl_pitch_line_y_pos}];
             
-            AttitudeIndicator::rotate_line(rotation_axis, roll_angle_in_radians, agl_attitude_line_pos);
+            gui_utils::rotate_line(rotation_axis, roll_angle_in_radians, agl_attitude_line_pos);
             
             let agl_attitude_line_shape: Shape = Shape::line_segment(*agl_attitude_line_pos, Stroke { width: 1.0, color: Color32::WHITE } );
         
@@ -309,18 +309,9 @@ impl AttitudeIndicator {
 
     fn draw_rotated_line(&self, ui: &mut Ui, rotation_axis: Pos2, points: &mut [Pos2; 2], angle_in_degrees: f32) {
 
-        AttitudeIndicator::rotate_line(rotation_axis, rust_math::trigonometry::deg2rad(angle_in_degrees), points);
+        gui_utils::rotate_line(rotation_axis, rust_math::trigonometry::deg2rad(angle_in_degrees), points);
+
         ui.painter().add(Shape::line(points.to_vec(), Stroke { width: 2.0, color: Color32::WHITE }));
-    }
-
-    fn rotate_line(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: &mut[Pos2; 2]) {
-
-
-        let (xc1, yc1) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[0]);
-
-        let (xc2, yc2) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, pos[1]);
-
-        *pos = [Pos2{x: xc1, y: yc1}, Pos2{x: xc2, y: yc2}];
     }
 
     fn build_path_shape_rect(x: f32, y: f32, width: f32, height: f32) -> Vec<Pos2> {
