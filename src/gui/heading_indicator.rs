@@ -113,14 +113,13 @@ impl HeadingIndicator {
 
     }
 
-    fn draw_heading_angles(&self, ui: &mut Ui, ctx: &egui::Context, heading_angle: f32, rotation_axis: Pos2, cliped_painter: Painter) {
-
-        let heading_angle_in_radians: f32 = rust_math::trigonometry::deg2rad(heading_angle) * -1.0;
-        let view_visible_angles: f32 = 60.0;
+    fn draw_heading_angles(&self, _ui: &mut Ui, ctx: &egui::Context, heading_angle: f32, rotation_axis: Pos2, cliped_painter: Painter) {
 
         // Draw reference heading angles
         for hdg in HeadingIndicator::ANGLES_TO_DRAW.iter() {
             
+            let heading_offset: f32 = (heading_angle - *hdg) * -1.0;
+
             let min_y: f32 = self.box_min_y + 15.0;
             let mut max_y: f32 = self.box_min_y + 20.0;
             let mut print_label: bool = false;
@@ -136,7 +135,7 @@ impl HeadingIndicator {
                 print_label = true;
             }
 
-            let hdg_ref_in_radians: f32 = rust_math::trigonometry::deg2rad(*hdg) * -1.0;
+            let hdg_ref_in_radians: f32 = rust_math::trigonometry::deg2rad(heading_offset) * -1.0;
 
             let hdg_line_pos: &mut [Pos2; 2] = &mut [Pos2{x: self.x_middle_pos, y: min_y}, Pos2{x: self.x_middle_pos, y: max_y}];
 
@@ -158,21 +157,6 @@ impl HeadingIndicator {
                     hdg_label_pos, Align::Center, Some(hdg_ref_in_radians));
             }
         }
-    }
-
-    fn draw_ref_ref_angle_label(
-        &self, cliped_painter: &Painter, ctx: &egui::Context, 
-        text_label: String, agl_pitch_line_y_pos: f32, x_anchor_pos: f32, 
-        anchor: Align, roll_angle_in_radians: f32, rotation_axis: Pos2) {
-        
-        let mut pos: Pos2 = Pos2{x: x_anchor_pos, y: agl_pitch_line_y_pos};
-
-        let (xc1, yc1) = gui_utils::rotate_pos2(rotation_axis, roll_angle_in_radians, pos);
-        pos = Pos2{x: xc1, y: yc1};
-        
-        gui_utils::draw_text_label(&cliped_painter, ctx, text_label, 
-                                    10.0, Color32::WHITE, Stroke::NONE, 
-                                    pos, anchor, Some(roll_angle_in_radians));
     }
 
 }
