@@ -1,22 +1,28 @@
 /**
  * PFD for Primary Flight Display
  * Display graphically : 
- * - speed (IAS in knots)
- * - Altitude (Feets)
+ * - Speed (IAS in knots)
+ * - Altitude (feets)
  * - Bank angle (deg)
  * - Pitch angle (deg)
  * - Vertical speed (feets/min)
+ * - Heading (deg)
  */
 
 
 use std::sync::MutexGuard;
 
-use egui::{Ui, Pos2, epaint::RectShape, Painter, Rect, Rounding, Color32, Stroke, Shape};
+use egui::{Ui, Pos2, epaint::RectShape, Painter, Rect, Rounding, Color32, Stroke, Shape, TextureId};
 
 use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
 
-use super::{speed_indicator::SpeedIndicator, gui_utils, altitude_indicator::{self, AltitudeIndicator}};
+use super::{
+    gui_utils,
+    speed_indicator::SpeedIndicator, 
+    altitude_indicator::AltitudeIndicator,
+    heading_indicator::HeadingIndicator
+};
 
 pub struct PrimaryFligthDisplay { 
 
@@ -90,9 +96,11 @@ impl PrimaryFligthDisplay {
 
             let box_rect: RectShape = RectShape { 
                 rect: clip_rect, 
-                rounding: Rounding::none(), 
+                rounding: Rounding::ZERO, 
                 fill: Color32::BLACK, 
-                stroke: Stroke { width: 2.0, color: Color32::BLACK } 
+                stroke: Stroke { width: 2.0, color: Color32::BLACK },
+                fill_texture_id: TextureId::Managed(0),
+                uv: Rect::ZERO
             };
 
             // Call painter to draw objects
@@ -112,10 +120,16 @@ impl PrimaryFligthDisplay {
                 Pos2{x: self.box_max_x - 100.0, y: self.box_min_y + 60.0},
                 75.0,
                 400.0);
+            
+            let heading_indicator: HeadingIndicator = HeadingIndicator::new(
+                Pos2{x: self.box_min_x + 95.0, y: self.box_min_y + 500.0},
+                300.0,
+                100.0);
 
             speed_indicator.view_update(state, ctx, ui);
             attitude_indicator.view_update(state, ctx, ui);
             altitude_indicator.view_update(state, ctx, ui);
+            heading_indicator.view_update(state, ctx, ui);
         });
     }
 }

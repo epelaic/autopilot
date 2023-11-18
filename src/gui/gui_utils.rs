@@ -22,6 +22,16 @@ pub fn rotate_pos2(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: Pos2) -
     (xc, yc)
 }
 
+pub fn rotate_line(rotation_axis: Pos2, roll_angle_in_radians: f32, pos: &mut[Pos2; 2]) {
+
+
+    let (xc1, yc1) = rotate_pos2(rotation_axis, roll_angle_in_radians, pos[0]);
+
+    let (xc2, yc2) = rotate_pos2(rotation_axis, roll_angle_in_radians, pos[1]);
+
+    *pos = [Pos2{x: xc1, y: yc1}, Pos2{x: xc2, y: yc2}];
+}
+
 
 pub fn draw_text_label(
     cliped_painter: &Painter, ctx: &egui::Context, 
