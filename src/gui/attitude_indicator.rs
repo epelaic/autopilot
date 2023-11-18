@@ -156,11 +156,7 @@ impl AttitudeIndicator {
         // Draw horizon line attitude
         let attitude_line_pos: &mut [Pos2; 2] = &mut [Pos2{x: self.box_min_x * -1.5, y: pitch_line_y_pos}, Pos2{x: self.box_max_x * 1.5, y: pitch_line_y_pos}];
         
-        //println!("before rotate : {:?}", attitude_line_pos);
-        
         gui_utils::rotate_line(rotation_axis, roll_angle_in_radians, attitude_line_pos);
-        
-        //println!("after rotate : {:?}", attitude_line_pos);
         
         let attitude_line_shape: Shape = Shape::line_segment(*attitude_line_pos, Stroke { width: 1.0, color: Color32::WHITE } );
     
@@ -212,10 +208,6 @@ impl AttitudeIndicator {
         }
 
         self.draw_bank_angle_ref(ui, rotation_axis, roll_angle_in_radians);
-
-        // Draw axis rotation circle ref (debug purposes)
-        //cliped_painter.add(Shape::circle_filled(rotation_axis, 10.0, Color32::GREEN));
-
     }
 
     fn draw_attitude_ref_angle_label(
@@ -234,41 +226,6 @@ impl AttitudeIndicator {
     }
 
     fn draw_bank_angle_ref(&self, ui: &mut Ui, rotation_axis: Pos2, roll_angle_in_radians: f32) {
-
-        // Blue background
-        let base_point: Pos2 = Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0};
-        let mut bgr: Vec<Pos2> = Vec::new();
-        bgr.push(base_point.to_owned());
-
-        let agl_p: Vec<f32> = [10.0, 20.0, 30.0, 45.0, 60.0].to_vec();
-
-        for a in agl_p.iter() {
-            let base_p: &mut Pos2 = &mut base_point.to_owned();
-            let angle_in_radians: f32 = rust_math::trigonometry::deg2rad(*a);
-            let r: (f32, f32) = gui_utils::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
-            bgr.push(Pos2{x: r.0, y: r.1});
-        }
-
-        // 60° left border
-        bgr.push(Pos2{x: self.box_min_x, y: self.box_min_y + 60.0 });
-        // Top left corner
-        bgr.push(Pos2{x: self.box_min_x, y: self.box_min_y });
-        // Top rigth corner
-        bgr.push(Pos2{x: self.box_max_x, y: self.box_min_y });
-        // 60° right border
-        bgr.push(Pos2{x: self.box_max_x, y: self.box_min_y + 60.0 });
-
-        let agl_n: Vec<f32> = [-60.0, -45.0, -30.0, -20.0, -10.0].to_vec();
-
-        for a in agl_n.iter() {
-            let base_p: &mut Pos2 = &mut base_point.to_owned();
-            let angle_in_radians: f32 = rust_math::trigonometry::deg2rad(*a);
-            let r: (f32, f32) = gui_utils::rotate_pos2(rotation_axis, angle_in_radians, *base_p);
-            bgr.push(Pos2{x: r.0, y: r.1});
-        }
-
-        let bgr_shape: PathShape = PathShape { points: bgr, closed: true, fill: Color32::BLUE, stroke: Stroke{ width: 2.0, color: Color32::BLUE } };
-        ui.painter().add(bgr_shape);
 
         // 0° reverse triangle reference
         let mut trg: Vec<Pos2> = Vec::new();
