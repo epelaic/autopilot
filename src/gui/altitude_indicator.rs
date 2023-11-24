@@ -121,15 +121,15 @@ impl AltitudeIndicator {
 
     fn draw_alt_msl(&self, alt_msl: f32, ctx: &egui::Context, cliped_painter: &Painter) {
 
-        // IAS Rect background
+        // Alt Rect background
         let ias_bg_path_points: Vec<Pos2> = vec![
+            Pos2{x: self.x_middle_pos - 30.0, y: self.y_middle_pos + 5.0}, // cut bottom left
+            Pos2{x: self.x_middle_pos - 40.0, y: self.y_middle_pos}, // Edge left
+            Pos2{x: self.x_middle_pos - 30.0, y: self.y_middle_pos - 5.0}, // cut top left
             Pos2{x: self.x_middle_pos - 30.0, y: self.y_middle_pos - 15.0}, // top left
             Pos2{x: self.x_middle_pos + 38.0, y: self.y_middle_pos - 15.0}, // top right
             Pos2{x: self.x_middle_pos + 38.0, y: self.y_middle_pos + 15.0}, // bottom right
             Pos2{x: self.x_middle_pos - 30.0, y: self.y_middle_pos + 15.0}, // bottom left
-            Pos2{x: self.x_middle_pos - 30.0, y: self.y_middle_pos + 5.0}, // cut bottom left
-            Pos2{x: self.x_middle_pos - 40.0, y: self.y_middle_pos}, // Edge left
-            Pos2{x: self.x_middle_pos - 30.0, y: self.y_middle_pos - 5.0} // cut top left
             ];
         let ias_bg_path = PathShape{points: ias_bg_path_points, closed: true, 
             fill: Color32::BLACK, stroke: Stroke{width: 1.5, color: Color32::YELLOW}};
