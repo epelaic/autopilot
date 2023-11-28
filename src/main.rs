@@ -122,8 +122,13 @@ fn main() {
     println!("Autopilot ready");
 
     // Init Gui APP
-    let options = &mut eframe::NativeOptions::default();
-    options.initial_window_size = Some(Vec2{x: 800.0, y: 700.0});
+    let options = &mut eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default()
+            .with_inner_size([800.0, 700.0])
+            .with_drag_and_drop(true),
+            ..Default::default()
+    };
+    //options.with_inner_size = Some(Vec2{x: 800.0, y: 700.0});
 
     let _ = eframe::run_native(
         "Autopilot",
