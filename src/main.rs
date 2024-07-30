@@ -133,7 +133,7 @@ fn main() {
     let _ = eframe::run_native(
         "Autopilot",
         options.to_owned(),
-        Box::new(|cc| Box::new(GuiApp::new(cc, gui_state, gui_tx_ap))),
+        Box::new(|cc| Ok(Box::new(GuiApp::new(cc, gui_state, gui_tx_ap)))),
     );
 
     // join the handles in the vector

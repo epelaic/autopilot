@@ -4,8 +4,9 @@ use std::sync::MutexGuard;
 
 use egui::TextureId;
 use egui::{Painter, Ui, Pos2, Color32, Stroke, Shape, Rounding,
-    epaint::RectShape, epaint::Rect};
+    epaint::RectShape, epaint::Rect, epaint::PathStroke};
 use eframe::{emath::align::Align, epaint::PathShape};
+
 
 use crate::gui::gui::GuiState;
 use crate::gui::gui_utils;
@@ -76,6 +77,7 @@ impl AttitudeIndicator {
             fill: Color32::BLUE, 
             stroke: Stroke { width: 2.0, color: Color32::BROWN },
             fill_texture_id: TextureId::Managed(0),
+            blur_width: 0f32,
             uv: Rect::ZERO
         };
 
@@ -99,6 +101,7 @@ impl AttitudeIndicator {
             fill: Color32::BLACK, 
             stroke: Stroke { width: 1.0, color: Color32::WHITE },
             fill_texture_id: TextureId::Managed(0),
+            blur_width: 0f32,
             uv: Rect::ZERO
         };
 
@@ -112,6 +115,7 @@ impl AttitudeIndicator {
             fill: Color32::BLACK, 
             stroke: Stroke { width: 1.0, color: Color32::WHITE },
             fill_texture_id: TextureId::Managed(0),
+            blur_width: 0f32,
             uv: Rect::ZERO
         };  
 
@@ -125,6 +129,7 @@ impl AttitudeIndicator {
             fill: Color32::TRANSPARENT, 
             stroke: Stroke { width: 2.0, color: Color32::WHITE },
             fill_texture_id: TextureId::Managed(0),
+            blur_width: 0f32,
             uv: Rect::ZERO
         };
 
@@ -149,7 +154,7 @@ impl AttitudeIndicator {
         let ground_rect_vec: Vec<Pos2> = AttitudeIndicator::build_path_shape_rect(self.x_middle_pos - 250.0, pitch_line_y_pos, 500.0, self.height + 150.0 );
         let ground_rect_vec_mut: &mut Vec<Pos2> = &mut ground_rect_vec.to_owned();
         AttitudeIndicator::rotate_vec_pos2(rotation_axis, roll_angle_in_radians, ground_rect_vec_mut);
-        let ground_rect: PathShape = PathShape{points: ground_rect_vec_mut.to_vec(), closed: true, fill: Color32::BROWN, stroke: Stroke::NONE };
+        let ground_rect: PathShape = PathShape{points: ground_rect_vec_mut.to_vec(), closed: true, fill: Color32::BROWN, stroke: PathStroke::NONE };
 
         cliped_painter.add(ground_rect);
 
@@ -233,7 +238,7 @@ impl AttitudeIndicator {
         trg.push(Pos2{x: self.x_middle_pos + 15.0, y: self.box_min_y});
         trg.push(Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0});
 
-        let trg_shape: PathShape = PathShape { points: trg, closed: true, fill: Color32::WHITE, stroke: Stroke::NONE };
+        let trg_shape: PathShape = PathShape { points: trg, closed: true, fill: Color32::WHITE, stroke: PathStroke::NONE };
         ui.painter().add(trg_shape);
 
         // Bank angle triangle attitude
@@ -244,7 +249,7 @@ impl AttitudeIndicator {
 
         AttitudeIndicator::rotate_vec_pos2(rotation_axis, roll_angle_in_radians, &mut bank);
 
-        let bank_shape: PathShape = PathShape { points: bank, closed: true, fill: Color32::YELLOW, stroke: Stroke::NONE };
+        let bank_shape: PathShape = PathShape { points: bank, closed: true, fill: Color32::YELLOW, stroke: PathStroke::NONE };
         ui.painter().add(bank_shape);
 
         // +10° line

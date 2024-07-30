@@ -2,7 +2,7 @@ use std::sync::MutexGuard;
 
 use egui::Align;
 use egui::{Pos2, Ui, Rect, Painter, epaint::RectShape, Rounding, Color32, Stroke, Shape, TextureId};
-use egui::epaint::PathShape;
+use egui::epaint::{PathShape, PathStroke, ColorMode};
 
 use super::{gui_utils, gui::GuiState};
 
@@ -81,6 +81,7 @@ impl HeadingIndicator {
             fill: Color32::BLACK, 
             stroke: Stroke { width: 2.0, color: Color32::BLACK },
             fill_texture_id: TextureId::Managed(0),
+            blur_width: 0f32,
             uv: Rect::ZERO
         };
 
@@ -98,7 +99,7 @@ impl HeadingIndicator {
         trg.push(Pos2{x: self.x_middle_pos + 15.0, y: self.box_min_y});
         trg.push(Pos2{x: self.x_middle_pos, y: self.box_min_y + 15.0});
 
-        let trg_shape: PathShape = PathShape { points: trg, closed: true, fill: Color32::BLACK, stroke: Stroke { width: 2.0, color: Color32::WHITE }};
+        let trg_shape: PathShape = PathShape { points: trg, closed: true, fill: Color32::BLACK, stroke: PathStroke { width: 2.0, color: ColorMode::Solid(Color32::WHITE) }};
         cliped_painter.add(trg_shape);
 
         // Vertical white middle line

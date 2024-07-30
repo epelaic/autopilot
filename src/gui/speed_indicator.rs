@@ -1,6 +1,6 @@
 use std::sync::MutexGuard;
 
-use egui::epaint::{RectShape, PathShape};
+use egui::epaint::{RectShape, PathShape, PathStroke, ColorMode};
 use egui::{Pos2, Ui, Rect, Painter, Rounding, Color32, Stroke, Shape, Align, TextureId};
 use crate::gui::gui::GuiState;
 use crate::gui::gui_utils;
@@ -69,6 +69,7 @@ impl SpeedIndicator {
             fill: Color32::GRAY, 
             stroke: Stroke { width: 2.0, color: Color32::GRAY },
             fill_texture_id: TextureId::Managed(0),
+            blur_width: 0f32,
             uv: Rect::ZERO
         };
 
@@ -121,7 +122,7 @@ impl SpeedIndicator {
                 Pos2{x: self.x_middle_pos + 15.0, y:v_scale_y_pos}
             ];
 
-            cliped_painter.add(Shape::LineSegment { points: v_scale_line_pos, stroke: Stroke { width: 1.5, color: Color32::WHITE } });
+            cliped_painter.add(Shape::LineSegment { points: v_scale_line_pos, stroke: PathStroke { width: 1.5, color: ColorMode::Solid(Color32::WHITE) } });
         }
 
     }
@@ -139,7 +140,7 @@ impl SpeedIndicator {
             Pos2{x: self.x_middle_pos - 35.0, y: self.y_middle_pos + 15.0} // bottom left
             ];
         let ias_bg_path = PathShape{points: ias_bg_path_points, closed: true, 
-            fill: Color32::BLACK, stroke: Stroke{width: 1.5, color: Color32::YELLOW}};
+            fill: Color32::BLACK, stroke: PathStroke{width: 1.5, color: ColorMode::Solid(Color32::YELLOW)}};
         cliped_painter.add(ias_bg_path);
 
         // IAS Text

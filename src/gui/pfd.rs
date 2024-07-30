@@ -99,6 +99,7 @@ impl PrimaryFligthDisplay {
                 rounding: Rounding::ZERO, 
                 fill: Color32::BLACK, 
                 stroke: Stroke { width: 2.0, color: Color32::BLACK },
+                blur_width: 0f32,
                 fill_texture_id: TextureId::Managed(0),
                 uv: Rect::ZERO
             };

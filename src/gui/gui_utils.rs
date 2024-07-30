@@ -53,7 +53,7 @@ pub fn draw_text_label(
         None => 0.0f32
     };
 
-    let text_shape: TextShape = TextShape { pos, galley, underline: font_stroke, override_text_color: None, angle: angle * -1.0 };
+    let text_shape: TextShape = TextShape { pos, galley, underline: font_stroke, override_text_color: None, angle: angle * -1.0, fallback_color: Color32::WHITE, opacity_factor: 1f32 };
     
     cliped_painter.add(text_shape);
 }
