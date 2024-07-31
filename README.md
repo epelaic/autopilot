@@ -81,5 +81,5 @@ sim/cockpit2/engine/actuators/throttle_ratio_all
 
 Cockpit mapping : 
 PFD speed : #3 Vind (kias ?)
-PDF Alt : #20  Alt (ind) or Alt (ftmsl) ?
+PFD Alt : #20  Alt (ind) or Alt (ftmsl) ?
 PFD Heading : #19 Mag (comp)
