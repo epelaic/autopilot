@@ -114,8 +114,6 @@ pub mod gui {
             let mut state: MutexGuard<GuiState> = self.state.lock().unwrap();
 
             egui::CentralPanel::default().show(ctx, |ui| {
-                
-                ui.heading("Autopilot App");
 
                 self.ap_panel.view_update(&mut state, ctx, ui, self);
                 self.pfd.view_update(&mut state, ctx, ui);
