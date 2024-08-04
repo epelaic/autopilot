@@ -13,45 +13,22 @@
  * - AP Altitude hold target value (feets)
  */
 use std::sync::MutexGuard;
-use egui::{Ui, Pos2};
+use egui::Ui;
 use crate::gui::gui::GuiState;
-use super::gui_utils;
 
 pub struct DebugPanel {
 
-    pub position: Pos2,
     pub width: f32,
     pub height: f32,
-
-    box_min_x: f32,
-    box_max_x: f32,
-    box_min_y: f32,
-    box_max_y: f32,
-    x_middle_pos: f32,
-    y_middle_pos: f32,
  }
 
 impl DebugPanel {
 
-    pub fn new(position: Pos2, width: f32, height: f32) -> DebugPanel {
-
-        let box_min_x: f32 = position.x;
-        let box_max_x: f32 = position.x + width;
-        let box_min_y: f32 = position.y;
-        let box_max_y: f32 = position.y + height;
-        let x_middle_pos: f32 = gui_utils::get_middle_pos(box_min_x, width);
-        let y_middle_pos: f32 = gui_utils::get_middle_pos(box_min_y, height);
+    pub fn new(width: f32, height: f32) -> DebugPanel {
 
         DebugPanel{
-            position,
             width,
-            height,
-            box_min_x,
-            box_max_x,
-            box_min_y,
-            box_max_y,
-            x_middle_pos,
-            y_middle_pos
+            height
         }
     }
 

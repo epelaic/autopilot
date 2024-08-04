@@ -86,15 +86,12 @@ pub mod gui {
                 state: state, 
                 gui_tx_ap: gui_tx_ap, 
                 ap_panel: ModeControlPanel::new(
-                    Pos2{x: 0.0, y: 0.0},
                     1100.0,
                     100.0), 
                 pfd: PrimaryFligthDisplay::new(
-                    Pos2{x: 50.0, y: 100.0},
                     500.0,
                     605.0),
                 debug_panel: DebugPanel::new(
-                    Pos2{x: 0.0, y: 0.0},
                     1100.0,
                     50.0)
             }

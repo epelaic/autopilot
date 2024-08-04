@@ -1,6 +1,43 @@
 use egui::{Painter, Align, Pos2, FontId, FontFamily, text::LayoutJob, Color32, epaint::TextShape, Stroke};
 
+pub struct RectWrapper {
 
+    pub position: Pos2,
+    pub width: f32,
+    pub height: f32,
+
+    pub box_min_x: f32,
+    pub box_max_x: f32,
+    pub box_min_y: f32,
+    pub box_max_y: f32,
+    pub x_middle_pos: f32,
+    pub y_middle_pos: f32,
+}
+
+impl RectWrapper {
+    
+    pub fn new(position: Pos2, width: f32, height: f32) -> RectWrapper {
+
+        let box_min_x: f32 = position.x;
+        let box_max_x: f32 = position.x + width;
+        let box_min_y: f32 = position.y;
+        let box_max_y: f32 = position.y + height;
+        let x_middle_pos: f32 = get_middle_pos(box_min_x, width);
+        let y_middle_pos: f32 = get_middle_pos(box_min_y, height);
+
+        RectWrapper{
+            position,
+            width,
+            height,
+            box_min_x,
+            box_max_x,
+            box_min_y,
+            box_max_y,
+            x_middle_pos,
+            y_middle_pos
+        }
+    }
+}
 
 pub fn get_middle_pos(position_min: f32, width_or_height:f32) -> f32 {
 

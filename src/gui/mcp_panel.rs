@@ -17,42 +17,20 @@ use crate::gui::constants::{ALT_100_STEP_VALUE, ALT_500_STEP_VALUE, ALT_MAX_VALU
 use crate::gui::common::{decrement_value, increment_value};
 
 use super::common::APBusMessageSender;
-use super::gui_utils;
+
 pub struct ModeControlPanel {
 
-    pub position: Pos2,
     pub width: f32,
-    pub height: f32,
-
-    box_min_x: f32,
-    box_max_x: f32,
-    box_min_y: f32,
-    box_max_y: f32,
-    x_middle_pos: f32,
-    y_middle_pos: f32,
+    pub height: f32
  }
 
 impl ModeControlPanel {
 
-    pub fn new(position: Pos2, width: f32, height: f32) -> ModeControlPanel {
-
-        let box_min_x: f32 = position.x;
-        let box_max_x: f32 = position.x + width;
-        let box_min_y: f32 = position.y;
-        let box_max_y: f32 = position.y + height;
-        let x_middle_pos: f32 = gui_utils::get_middle_pos(box_min_x, width);
-        let y_middle_pos: f32 = gui_utils::get_middle_pos(box_min_y, height);
+    pub fn new(width: f32, height: f32) -> ModeControlPanel {
 
         ModeControlPanel{
-            position,
             width,
-            height,
-            box_min_x,
-            box_max_x,
-            box_min_y,
-            box_max_y,
-            x_middle_pos,
-            y_middle_pos
+            height
         }
     }
 

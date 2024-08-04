@@ -18,51 +18,27 @@ use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
 
 use super::{
-    gui_utils,
-    speed_indicator::SpeedIndicator, 
-    altitude_indicator::AltitudeIndicator,
-    heading_indicator::HeadingIndicator
+    altitude_indicator::AltitudeIndicator, gui_utils::{self, RectWrapper}, heading_indicator::HeadingIndicator, speed_indicator::SpeedIndicator
 };
 
 pub struct PrimaryFligthDisplay { 
 
-    pub position: Pos2,
     pub width: f32,
     pub height: f32,
-
-    box_min_x: f32,
-    box_max_x: f32,
-    box_min_y: f32,
-    box_max_y: f32,
-    x_middle_pos: f32,
-    y_middle_pos: f32,
 }
 
 impl PrimaryFligthDisplay {
 
-    pub fn new(position: Pos2, width: f32, height: f32) -> PrimaryFligthDisplay {
-
-        let box_min_x: f32 = position.x;
-        let box_max_x: f32 = position.x + width;
-        let box_min_y: f32 = position.y;
-        let box_max_y: f32 = position.y + height;
-        let x_middle_pos: f32 = gui_utils::get_middle_pos(box_min_x, width);
-        let y_middle_pos: f32 = gui_utils::get_middle_pos(box_min_y, height);
+    pub fn new(width: f32, height: f32) -> PrimaryFligthDisplay {
 
         PrimaryFligthDisplay{
-            position,
             width,
-            height,
-            box_min_x,
-            box_max_x,
-            box_min_y,
-            box_max_y,
-            x_middle_pos,
-            y_middle_pos
+            height
         }
     }
 
     pub fn view_update(&self, state: &mut MutexGuard<GuiState>, ctx: &egui::Context, ui: &mut Ui) {
+
 
         egui::Frame::none()
             .fill(egui::Color32::GRAY)
@@ -73,10 +49,14 @@ impl PrimaryFligthDisplay {
                 ui.set_height(self.height);
                 ui.set_width(self.width);
 
+                let position = Pos2{x: ui.max_rect().left_top().x, y: ui.max_rect().left_top().y};
+
+                let pfd_rect_wraper: RectWrapper = RectWrapper::new(position, self.width, self.height);
+
                 // Primary rect (external boundaries)
                 let clip_rect: Rect = Rect{
-                    min: Pos2{x: self.box_min_x, y: self.box_min_y }, 
-                    max: Pos2{x: self.box_max_x, y: self.box_max_y}
+                    min: Pos2{x: pfd_rect_wraper.box_min_x, y: pfd_rect_wraper.box_min_y }, 
+                    max: Pos2{x: pfd_rect_wraper.box_max_x, y: pfd_rect_wraper.box_max_y}
                 };
                 
                 let cliped_painter: Painter = ui.painter().with_clip_rect(clip_rect);
@@ -95,22 +75,22 @@ impl PrimaryFligthDisplay {
                 cliped_painter.add(Shape::Rect(box_rect));
 
                 let speed_indicator: SpeedIndicator = SpeedIndicator::new(
-                    Pos2{x: self.box_min_x + 15.0, y: self.box_min_y + 60.0},
+                    Pos2{x: pfd_rect_wraper.box_min_x + 15.0, y: pfd_rect_wraper.box_min_y + 60.0},
                     75.0,
                     400.0);
 
                 let attitude_indicator: AttitudeIndicator = AttitudeIndicator::new(
-                    Pos2{x: self.box_min_x + 95.0, y: self.box_min_y + 116.0},
+                    Pos2{x: pfd_rect_wraper.box_min_x + 95.0, y: pfd_rect_wraper.box_min_y + 116.0},
                     300.0,
                     300.0);
 
                 let altitude_indicator: AltitudeIndicator = AltitudeIndicator::new(
-                    Pos2{x: self.box_max_x - 100.0, y: self.box_min_y + 60.0},
+                    Pos2{x: pfd_rect_wraper.box_max_x - 100.0, y: pfd_rect_wraper.box_min_y + 60.0},
                     75.0,
                     400.0);
                 
                 let heading_indicator: HeadingIndicator = HeadingIndicator::new(
-                    Pos2{x: self.box_min_x + 95.0, y: self.box_min_y + 500.0},
+                    Pos2{x: pfd_rect_wraper.box_min_x + 95.0, y: pfd_rect_wraper.box_min_y + 500.0},
                     300.0,
                     100.0);
 
