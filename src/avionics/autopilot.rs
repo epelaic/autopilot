@@ -57,6 +57,7 @@ pub mod autopilot {
 
             match ap_cmd {
                 APCmdPayload::SetAlt(alt) => self.set_ap_alt(alt),
+                APCmdPayload::EnableAltHoldMode(enable) => self.ap_state.alt_hold_mode = enable,
                 _ => ()
             }
 
