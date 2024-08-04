@@ -1,5 +1,6 @@
 
-mod ap_panel;
+mod debug_panel;
+mod mcp_panel;
 mod altitude_indicator;
 mod attitude_indicator;
 mod common;
@@ -20,7 +21,7 @@ pub mod gui {
 
     use crate::bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage};
     use crate::gui::common::APBusMessageSender;
-    use super::{pfd::PrimaryFligthDisplay, ap_panel::AutopilotPanel};
+    use super::{debug_panel::DebugPanel, mcp_panel::ModeControlPanel, pfd::PrimaryFligthDisplay};
 
     fn setup_custom_fonts(ctx: &egui::Context) {
         // Start with the default fonts (we will be adding to them rather than replacing them).
@@ -70,8 +71,9 @@ pub mod gui {
     pub struct GuiApp {
         pub state: Arc<Mutex<GuiState>>,
         pub gui_tx_ap: Sender<BusMessage>,
-        ap_panel: AutopilotPanel,
+        ap_panel: ModeControlPanel,
         pfd: PrimaryFligthDisplay,
+        debug_panel: DebugPanel
     }
 
     impl GuiApp {
@@ -83,11 +85,15 @@ pub mod gui {
             Self { 
                 state: state, 
                 gui_tx_ap: gui_tx_ap, 
-                ap_panel: AutopilotPanel{}, 
+                ap_panel: ModeControlPanel{}, 
                 pfd: PrimaryFligthDisplay::new(
                     Pos2{x: 250.0, y: 15.0},
                     500.0,
-                    605.0)
+                    605.0),
+                debug_panel: DebugPanel::new(
+                    Pos2{x: 0.0, y: 610.0},
+                    950.0,
+                    50.0)
             }
         }
     }
@@ -113,6 +119,7 @@ pub mod gui {
 
                 self.ap_panel.view_update(&mut state, ctx, ui, self);
                 self.pfd.view_update(&mut state, ctx, ui);
+                self.debug_panel.view_update(&mut state, ctx, ui);
             });
 
             ctx.request_repaint();

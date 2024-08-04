@@ -1,11 +1,13 @@
 
 /**
- * Autopilot Panel
+ * Mode Control Panel (MCP)
  * Display graphically : 
- * - speed/mach (IAS in knots)
- * - Altitude (Feets)
- * - Bank angle (deg) (deg)
- * - Vertical speed (feets/min)
+ * - AP Engage/disengage
+ * - AP Altitude Hold Mode, target value and selectors
+ * - Bank angle selector
+ * - Heading selector (and turn direction holder)
+ * - Vertical speed Mode, target value and selectors)
+ * - Speed Mode (Knots/Mach) toogle, target value and selectors)
  */
 use std::sync::MutexGuard;
 use egui::Ui;
@@ -15,10 +17,10 @@ use crate::gui::constants::{ALT_100_STEP_VALUE, ALT_500_STEP_VALUE, ALT_MAX_VALU
 use crate::gui::common::{decrement_value, increment_value};
 
 use super::common::APBusMessageSender;
-pub struct AutopilotPanel {
+pub struct ModeControlPanel {
  }
 
-impl AutopilotPanel {
+impl ModeControlPanel {
 
     pub fn view_update(&self, state: &mut MutexGuard<GuiState>, _ctx: &egui::Context, ui: &mut Ui, ap_msg_sender: &dyn APBusMessageSender) {
 
