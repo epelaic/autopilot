@@ -2,7 +2,7 @@
 pub mod autopilot {
 
     use std::sync::{Arc, mpsc::{Sender, Receiver, TryRecvError}};
-    use crate::{bus::{AdcDataMessage, BusMessage, APStateMessage, APCmdPayload}};
+    use crate::bus::{APCmdPayload, APStateMessage, APTurnSide, AdcDataMessage, BusMessage};
 
     use crate::{flight_ctrl::FlightCtrlsProvider};
 
@@ -58,6 +58,7 @@ pub mod autopilot {
             match ap_cmd {
                 APCmdPayload::SetAlt(alt) => self.set_ap_alt(alt),
                 APCmdPayload::EnableAltHoldMode(enable) => self.ap_state.alt_hold_mode = enable,
+                APCmdPayload::SetHeading{heading, turn_side} => self.set_ap_heading(heading as f32, turn_side),
                 _ => ()
             }
 
@@ -69,6 +70,13 @@ pub mod autopilot {
         fn set_ap_alt(&mut self, alt: f32) {
 
             self.ap_state.alt = alt;
+
+            self.notify_observers();
+        }
+
+        fn set_ap_heading(&mut self, heading: f32, turn_side: APTurnSide) {
+
+            self.ap_state.heading = heading;
 
             self.notify_observers();
         }

@@ -105,7 +105,7 @@ pub mod bus {
 
         // Modes values
 
-        SetHeading{ heading: u8, turn_side: APTurnSide },
+        SetHeading{ heading: f32, turn_side: APTurnSide },
         SetSpeed{ speed: f32, unit: SpeedUnit },
         SetVs(f32),
         SetAlt(f32),
@@ -113,7 +113,7 @@ pub mod bus {
 
     }
 
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, PartialEq)]
     pub enum APTurnSide {
         Left,
         Right
