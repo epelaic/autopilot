@@ -3,8 +3,7 @@ pub mod autopilot {
 
     use std::sync::{Arc, mpsc::{Sender, Receiver, TryRecvError}};
     use crate::bus::{APCmdPayload, APStateMessage, APTurnSide, AdcDataMessage, BusMessage};
-
-    use crate::{flight_ctrl::FlightCtrlsProvider};
+    use crate::flight_ctrl::FlightCtrlsProvider;
 
     pub struct Autopilot {
 
@@ -47,7 +46,7 @@ pub mod autopilot {
             }
         }
 
-        fn handle_adc_data_message(&mut self, adc_data: AdcDataMessage) {
+        fn handle_adc_data_message(&mut self, _adc_data: AdcDataMessage) {
             //println!("[AP][DATA] {:?}", adc_data);
         }
 
@@ -75,7 +74,7 @@ pub mod autopilot {
             self.notify_observers();
         }
 
-        fn set_ap_heading(&mut self, heading: f32, turn_side: APTurnSide) {
+        fn set_ap_heading(&mut self, heading: f32, _turn_side: APTurnSide) {
 
             self.ap_state.heading = heading;
 
@@ -99,5 +98,3 @@ pub mod autopilot {
     }
 
 }
-
-pub use autopilot::Autopilot;

@@ -1,5 +1,5 @@
 
-use std::{error::Error, fmt};
+use std::fmt;
 
 use num_traits::ToPrimitive;
 
@@ -37,7 +37,6 @@ pub fn decrement_value(old_value: &mut f32, step: f32, min: f32) {
 const MAX_HEADING_SELECTOR_VALUE: u32 = 180;
 const MAX_HEADING_VALUE: f32 = 360.0;
 const MIN_HEADING_VALUE: f32 = 0.0;
-const HALF_HEADING: f32 = 180.0;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum HeadingKnob {

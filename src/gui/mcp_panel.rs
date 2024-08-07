@@ -10,8 +10,8 @@
  * - Speed Mode (Knots/Mach) toogle, target value and selectors)
  */
 use std::sync::MutexGuard;
-use egui::{Button, Color32, Pos2, RichText, Ui};
-use crate::bus::{APCmdPayload, APTurnSide};
+use egui::{Button, Color32, RichText, Ui};
+use crate::bus::APCmdPayload;
 use crate::gui::gui::GuiState;
 use crate::gui::constants::{ALT_100_STEP_VALUE, ALT_500_STEP_VALUE, ALT_MAX_VALUE, ALT_MIN_VALUE};
 use crate::gui::common::{decrement_value, increment_value, get_next_ap_heading_value, APBusMessageSender, HeadingKnob};
