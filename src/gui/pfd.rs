@@ -18,7 +18,7 @@ use crate::gui::attitude_indicator::AttitudeIndicator;
 use crate::gui::gui::GuiState;
 
 use super::{
-    altitude_indicator::AltitudeIndicator, gui_utils::{self, RectWrapper}, heading_indicator::HeadingIndicator, speed_indicator::SpeedIndicator
+    altitude_indicator::AltitudeIndicator, gui_utils::RectWrapper, heading_indicator::HeadingIndicator, speed_indicator::SpeedIndicator
 };
 
 pub struct PrimaryFligthDisplay { 

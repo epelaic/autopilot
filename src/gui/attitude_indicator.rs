@@ -13,7 +13,6 @@ use crate::gui::gui_utils;
 
 pub struct AttitudeIndicator { 
 
-    pub position: Pos2,
     pub width: f32,
     pub height: f32,
 
@@ -46,7 +45,6 @@ impl AttitudeIndicator {
         let y_middle_pos: f32 = gui_utils::get_middle_pos(box_min_y, height);
 
         AttitudeIndicator{
-            position,
             width,
             height,
             box_min_x,

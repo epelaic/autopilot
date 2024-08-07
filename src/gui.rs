@@ -16,9 +16,6 @@ extern crate egui;
 pub mod gui {
 
     use std::sync::{mpsc::{Sender, Receiver, TryRecvError}, Arc, Mutex, MutexGuard};
-
-    use egui::Pos2;
-
     use crate::bus::{BusMessage, AdcDataMessage, APCmdPayload, APStateMessage};
     use crate::gui::common::APBusMessageSender;
     use super::{debug_panel::DebugPanel, mcp_panel::ModeControlPanel, pfd::PrimaryFligthDisplay};
