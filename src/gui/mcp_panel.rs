@@ -61,15 +61,39 @@ impl ModeControlPanel {
 
                         ui.horizontal(|ui| {
 
-                            if ui.button("10").clicked() {
+                            let mut bank_angle_10_btn_color: Color32 = Color32::WHITE;
+
+                            if state.ap_state.bank_angle == 10.0 {
+                                bank_angle_10_btn_color = Color32::LIGHT_GREEN;
+                            }
+                        
+                            let bank_angle_10_btn = Button::new(RichText::new("10").color(bank_angle_10_btn_color))
+                                                                        .fill(Color32::DARK_GRAY);
+                            if ui.add(bank_angle_10_btn).clicked() {
                                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetBankAngle(10));
                             }
 
-                            if ui.button("20").clicked() {
+                            let mut bank_angle_20_btn_color: Color32 = Color32::WHITE;
+
+                            if state.ap_state.bank_angle == 20.0 {
+                                bank_angle_20_btn_color = Color32::LIGHT_GREEN;
+                            }
+                        
+                            let bank_angle_20_btn = Button::new(RichText::new("20").color(bank_angle_20_btn_color))
+                                                                        .fill(Color32::DARK_GRAY);
+                            if ui.add(bank_angle_20_btn).clicked() {
                                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetBankAngle(20));
                             }
 
-                            if ui.button("30").clicked() {
+                            let mut bank_angle_30_btn_color: Color32 = Color32::WHITE;
+
+                            if state.ap_state.bank_angle == 30.0 {
+                                bank_angle_30_btn_color = Color32::LIGHT_GREEN;
+                            }
+                        
+                            let bank_angle_30_btn = Button::new(RichText::new("30").color(bank_angle_30_btn_color))
+                                                                        .fill(Color32::DARK_GRAY);
+                            if ui.add(bank_angle_30_btn).clicked() {
                                 ap_msg_sender.send_ap_cmd(APCmdPayload::SetBankAngle(30));
                             }
 
@@ -78,7 +102,7 @@ impl ModeControlPanel {
                         ui.horizontal(|ui| {
                             
                             let mut knob: HeadingKnob = HeadingKnob::None();
-
+                            
                             if ui.button("<<").clicked() {
                                 knob = HeadingKnob::Left(10);
                             }
