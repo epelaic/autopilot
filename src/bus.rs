@@ -70,6 +70,7 @@ pub mod bus {
         pub speed_unit: SpeedUnit,
         pub bank_angle: f32,
         pub vs: f32,
+        pub turn_side: APTurnSide
     }
 
     impl APStateMessage {
@@ -87,7 +88,8 @@ pub mod bus {
                 speed: 250f32,
                 speed_unit: SpeedUnit::IAS,
                 bank_angle: 10f32,
-                vs: 0f32
+                vs: 0f32,
+                turn_side: APTurnSide::Right
             }
         }
     }
@@ -113,7 +115,7 @@ pub mod bus {
 
     }
 
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum APTurnSide {
         Left,
         Right

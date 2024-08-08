@@ -120,7 +120,8 @@ impl ModeControlPanel {
                             }
 
                             if knob != HeadingKnob::None() {
-                                let new_heading_value_result = get_next_ap_heading_value(state.adc_state.heading, state.ap_state.heading, knob);
+                                
+                                let new_heading_value_result = get_next_ap_heading_value(state.adc_state.heading, state.ap_state.turn_side, state.ap_state.heading, knob);
                                 
                                 if new_heading_value_result.is_ok() {
                                     let new_heading_value = new_heading_value_result.ok().unwrap();

@@ -74,9 +74,10 @@ pub mod autopilot {
             self.notify_observers();
         }
 
-        fn set_ap_heading(&mut self, heading: f32, _turn_side: APTurnSide) {
+        fn set_ap_heading(&mut self, heading: f32, turn_side: APTurnSide) {
 
             self.ap_state.heading = heading;
+            self.ap_state.turn_side = turn_side;
 
             self.notify_observers();
         }
