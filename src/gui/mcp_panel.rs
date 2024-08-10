@@ -11,7 +11,7 @@
  */
 use std::sync::MutexGuard;
 use egui::{Button, Color32, RichText, Ui};
-use crate::bus::APCmdPayload;
+use crate::bus::{APCmdPayload, APTurnSide};
 use crate::gui::gui::GuiState;
 use crate::gui::constants::{ALT_100_STEP_VALUE, ALT_500_STEP_VALUE, ALT_MAX_VALUE, ALT_MIN_VALUE};
 use crate::gui::common::{decrement_value, increment_value, get_next_ap_heading_value, APBusMessageSender, HeadingKnob};
@@ -132,6 +132,15 @@ impl ModeControlPanel {
                             }
 
                         }); // End horizontal
+
+                        ui.horizontal(|ui| {
+                            if state.ap_state.turn_side == APTurnSide::Right {
+                                ui.label("->");
+                            } else {
+                                ui.label("<-");
+                            }
+                        }); // End horizontal
+                        
                     }); // End vertical
                 }); // End Frame
 
