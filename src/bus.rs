@@ -101,8 +101,8 @@ pub mod bus {
 
         // Modes AP
         EnableAltHoldMode(bool),
-        EnaleVSMode(bool),
-        EnalbeHeadingHoldMode(bool),
+        EnableVSMode(bool),
+        EnablbeHeadingHoldMode(bool),
         EnableAutoThrottleMode(bool),
 
         // Modes values
